@@ -22,7 +22,7 @@ class SendMail(APIView):
                   "robotjames.beepboop@gmail.com",
                   recepients,
                   auth_user="robotjames.beepboop@gmail.com",
-                  auth_password="weemannogoodXD"
+                  auth_password="criltzkkqcciorni"
 
                    )
         
