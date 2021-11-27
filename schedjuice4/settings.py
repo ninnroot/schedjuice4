@@ -138,7 +138,7 @@ EMAIL_PORT = 587
 
 # Celery stuffs
 
-BROKER_URL = "redis://localhost:6379"
+CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
 CELERE_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = 'json'
