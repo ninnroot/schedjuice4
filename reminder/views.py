@@ -20,15 +20,16 @@ class SendMail(APIView):
         body = data["body"]
         recepients = json.loads(data["recepients"])
         a = perf_counter()
-        print("got here")
+        
         x = send_mail_task.delay(
                   subj,
                   body,
                   "robotjames.beepboop@gmail.com",
                   recepients,
                   auth_user=config("EMAIL_HOST_USER"),
-                  auth_password=("EMAIL_HOST_PASSWORD")
+                  auth_password= config("EMAIL_HOST_PASSWORD")
                    )
+        
     
         return Response({"message":f"time: {perf_counter() - a}"}, status=status.HTTP_200_OK)
 
