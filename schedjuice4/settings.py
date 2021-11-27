@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Rangoon'
 
 USE_I18N = True
 
@@ -127,10 +127,21 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email sending stuffs
-#DataFlair
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 #EMAIL_HOST_USER = "your_account@gmail.com"
 #EMAIL_HOST_PASSWORD = "your account’s password
+
+
+# Celery stuffs
+
+BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERE_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = "Asia/Rangoon"
+CELERY_IGNORE_RESULT = False

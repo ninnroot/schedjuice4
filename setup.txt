@@ -1,0 +1,13 @@
+install redis
+
+for macOS, run these commands
+
+sudo mkdir schedjuice4
+cd schedjuice4
+git clone https://github.com/Ninroot-Eater/schedjuice4.git
+cd schedjuice4
+pip3 install -r requirements.txt
+python3 manage.py runserver
+
+
+
