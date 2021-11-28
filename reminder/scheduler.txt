@@ -1,0 +1,30 @@
+yea, I have it figured out kinda. But, yea.
+
+
+app.conf.beat_schedule={
+    
+    "send_mail": {
+        "task": "send_mail_task",
+        "schedule": 10,
+        "args":(
+                  "scheduled mail",
+                  "this is scheduled to sent every 10 sec",
+                  "noreply@teachersucenter.com",
+                  ["averyformalname@gmail.com"],
+                  
+                   )
+    },
+    "send_mail2": {
+        "task": "send_mail_task",
+        "schedule": 25,
+        "args":(
+                  "scheduled mail",
+                  "this is scheduled to sent every 25 sec",
+                  "noreply@teachersucenter.com",
+                  ["averyformalname@gmail.com"],
+                  
+                   )
+    },
+     
+
+}

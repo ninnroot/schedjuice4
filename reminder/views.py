@@ -24,10 +24,9 @@ class SendMail(APIView):
         x = send_mail_task.delay(
                   subj,
                   body,
-                  "robotjames.beepboop@gmail.com",
+                  "noreply@teachersucenter.com",
                   recepients,
-                  auth_user=config("EMAIL_HOST_USER"),
-                  auth_password= config("EMAIL_HOST_PASSWORD")
+                  
                    )
         
     
