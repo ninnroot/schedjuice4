@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 from decouple import config
 from celery.schedules import crontab
@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework",
     "reminder",
+    "staff_stuff",
+
+    # add this at last
+    "django_cleanup.apps.CleanupConfig"
 ]
 
 MIDDLEWARE = [
@@ -108,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "staff_stuff.Staff"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -127,6 +132,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Media files
+
+MEDIA_URL = '/media2/'
+MEDIA_ROOT = os.path.join(os.getcwd(),"media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -156,3 +166,7 @@ CELERY_TIMEZONE = "Asia/Rangoon"
 CELERY_IGNORE_RESULT = False
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
+}
