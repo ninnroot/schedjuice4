@@ -17,6 +17,7 @@ from .pagination import CustomPagination
 from .models import Department, Staff
 from .serializers import DepartmentSerializer, StaffSerializer
 from .filter import get_filter_query
+from .helpers import delete_helper, getlist_helper, getdetails_helper, post_helper, put_helper
 
 # Create your views here.
 
@@ -24,14 +25,8 @@ from .filter import get_filter_query
 class StaffList(APIView, CustomPagination):
     
     
-    paginator = PageNumberPagination()
-    
     def get(self, request):
-        obj = get_filter_query(Staff,request)
-        page = self.paginate_queryset(obj,request)
-        seri = StaffSerializer(page,many=True)
-        
-        return self.get_paginated_response(seri.data, status=status.HTTP_200_OK)
+        return getlist_helper(Staff,request,StaffSerializer,self)
 
     def post(self, request):
         seri = StaffSerializer(data=request.data)
@@ -47,10 +42,7 @@ class StaffList(APIView, CustomPagination):
 class StaffDetails(APIView):
 
     def get(self, request, obj_id):
-        obj = get_object_or_404(Staff,pk=obj_id)
-        seri = StaffSerializer(obj)
-
-        return Response(seri.data, status=status.HTTP_200_OK)
+        return getdetails_helper(Staff,request,StaffSerializer,obj_id)
 
     def put(self, request, obj_id):
         obj = get_object_or_404(Staff, pk=obj_id)
@@ -62,39 +54,26 @@ class StaffDetails(APIView):
             return Response(seri.data, status=status.HTTP_200_OK)
         return Response(seri.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request,obj_id):
+        return delete_helper(Staff,request,StaffSerializer,obj_id)
 
 
-class DepartmentList(APIView):
+class DepartmentList(APIView,CustomPagination):
     
     def get(self, request):
-        obj = Department.objects.all()
-        seri = DepartmentSerializer(obj,many=True)
-
-        return Response(seri.data, status=status.HTTP_200_OK)
+        return getlist_helper(Department,request,DepartmentSerializer,self)
 
     def post(self, request):
-        seri = DepartmentSerializer(data=request.data)
-
-        if seri.is_valid():
-            seri.save()
-
-            return Response(seri.data, status=status.HTTP_201_CREATED)
-        return Response(seri.errors, status=status.HTTP_400_BAD_REQUEST)
+        return post_helper(Department,request,DepartmentSerializer)
 
 class DepartmentDetails(APIView):
 
     def get(self, request, obj_id):
-        obj = get_object_or_404(Department,pk=obj_id)
-        seri = DepartmentSerializer(obj)
-
-        return Response(seri.data, status=status.HTTP_200_OK)
+        return getdetails_helper(Department,request,DepartmentSerializer,obj_id)
 
     def put(self, request, obj_id):
-        obj = get_object_or_404(Department, pk=obj_id)
-        seri = DepartmentSerializer(obj, data=request.data, partial=True)
+        return put_helper(Department,request,DepartmentSerializer,obj_id)
 
-        if seri.is_valid():
-            seri.save()
+    def delete(self, request,obj_id):
+        return delete_helper(Department,request,DepartmentSerializer,obj_id)
 
-            return Response(seri.data, status=status.HTTP_200_OK)
-        return Response(seri.errors, status=status.HTTP_400_BAD_REQUEST)

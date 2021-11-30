@@ -1,7 +1,4 @@
-from typing import Union
 from django.db import models
-from django.db import models
-from django.db.models import fields
 from rest_framework.request import Request
 
 # default django filter-backend needs the use of GenericViews, 
