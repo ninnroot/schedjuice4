@@ -1,6 +1,3 @@
-from functools import partial
-from django.core import paginator
-from django.db.models import manager
 from django.shortcuts import render
 from rest_framework import pagination
 from rest_framework.views import APIView
@@ -9,14 +6,15 @@ from rest_framework.generics import get_object_or_404
 from rest_framework import serializers, status
 from django.http import Http404
 from django.contrib.auth.hashers import make_password
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.settings import api_settings
 from .pagination import CustomPagination
 
 
-from .models import Department, Staff
-from .serializers import DepartmentSerializer, StaffSerializer
-from .filter import get_filter_query
+from .models import Department, Staff, Tag, StaffTag, StaffDepartment
+from .serializers import (
+                        DepartmentSerializer, StaffSerializer,
+                        StaffTagSerializer, TagOnlySerializer, TagSerializer,
+                        StaffTagOnlySerializer, StaffDepartmentOnlySerializer,
+                        StaffDepartmentSerializer)
 from .helpers import delete_helper, getlist_helper, getdetails_helper, post_helper, put_helper
 
 # Create your views here.
@@ -26,6 +24,7 @@ class StaffList(APIView, CustomPagination):
     
     
     def get(self, request):
+        
         return getlist_helper(Staff,request,StaffSerializer,self)
 
     def post(self, request):
@@ -77,3 +76,58 @@ class DepartmentDetails(APIView):
     def delete(self, request,obj_id):
         return delete_helper(Department,request,DepartmentSerializer,obj_id)
 
+
+class TagList(APIView,CustomPagination):
+    
+    def get(self, request):
+        return getlist_helper(Tag,request,TagSerializer,self)
+
+    def post(self, request):
+        return post_helper(Tag,request,TagSerializer)
+
+class TagDetails(APIView):
+
+    def get(self, request, obj_id):
+        return getdetails_helper(Tag,request,TagSerializer,obj_id)
+
+    def put(self, request, obj_id):
+        return put_helper(Tag,request,TagSerializer,obj_id)
+
+    def delete(self, request,obj_id):
+        return delete_helper(Tag,request,TagSerializer,obj_id)
+
+
+
+class StaffTagList(APIView,CustomPagination):
+    
+    def get(self, request):
+        return getlist_helper(StaffTag,request,StaffTagSerializer,self)
+
+    def post(self, request):
+        return post_helper(StaffTag,request,StaffTagOnlySerializer)
+
+class StaffTagDetails(APIView):
+
+    def get(self, request, obj_id):
+        return getdetails_helper(StaffTag,request,StaffTagSerializer,obj_id)
+
+    def delete(self, request,obj_id):
+        return delete_helper(StaffTag,request,StaffTagSerializer,obj_id)
+
+class StaffDepartmentList(APIView,CustomPagination):
+    
+    def get(self, request):
+        return getlist_helper(StaffDepartment,request,StaffDepartmentSerializer,self)
+
+    def post(self, request):
+        return post_helper(StaffDepartment,request,StaffDepartmentOnlySerializer)
+
+
+
+class StaffDepartmentDetails(APIView):
+
+    def get(self, request, obj_id):
+        return getdetails_helper(StaffDepartment,request,StaffDepartmentSerializer,obj_id)
+
+    def delete(self, request,obj_id):
+        return delete_helper(StaffDepartment,request,StaffDepartmentSerializer,obj_id)

@@ -12,7 +12,6 @@ def get_filter_query(model:models.Model,request:Request):
     
     for i in invalid_keys:
         q.pop(i,None)
-
     return model.objects.filter(**q)
 
 

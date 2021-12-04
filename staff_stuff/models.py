@@ -3,13 +3,8 @@ from datetime import date, time
 from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.db.models.deletion import SET_NULL
-from django.utils import timezone
 from django.core.validators import RegexValidator
 from .managers import UserManager
-
-
-
 
 
 class Department(models.Model):
@@ -21,6 +16,8 @@ class Department(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = 'department'
+        verbose_name_plural = 'departments'
         ordering = ["id"]
 
 class Staff(AbstractBaseUser, PermissionsMixin):
@@ -36,9 +33,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     region = models.CharField(max_length=8, default="0")
     profile_pic = models.ImageField(default="profile_pics/default.jpg", upload_to="profile_pics") 
     first_day = models.DateField(default=date(2018,1,1))
-
-    department = models.ForeignKey(Department, null=True, on_delete=SET_NULL)
-
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -52,3 +47,47 @@ class Staff(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'staff members'
         ordering = ["id"]
 
+class Tag(models.Model):
+
+    name = models.CharField(max_length=128, unique=True)
+    description = models.TextField(default="Description...")
+    color = models.CharField(max_length=7, default="#000000")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'tag'
+        verbose_name_plural = 'tags'
+        ordering = ["-id"]
+
+class StaffDepartment(models.Model):
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    pos = models.IntegerField()
+    is_primary = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "staffdepartment relation"
+        verbose_name_plural = "staffdepartment relations"
+        
+        ordering = ["-id"]
+
+
+class StaffTag(models.Model):
+
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    pos = models.IntegerField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "stafftag relation"
+        verbose_name_plural = "stafftag relations"
+        
+        ordering = ["-id"]

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "reminder",
     "staff_stuff",
+    "work_stuff",
 
     # add this at last
     "django_cleanup.apps.CleanupConfig"

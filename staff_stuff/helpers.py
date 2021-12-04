@@ -1,3 +1,4 @@
+from django.db.models import fields
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -7,16 +8,31 @@ from django.db import models
 from rest_framework.request import Request
 from .filter import get_filter_query
 
+
+def fields_helper(request:Request):
+    fields = None
+    if "fields" in request.query_params:
+        fields=request.query_params.get("fields")
+    return fields
+
 def getlist_helper(model:models.Model, request:Request, serializer:ModelSerializer, obj):
     query = get_filter_query(model,request)
     page = obj.paginate_queryset(query,request)
-    seri = serializer(page,many=True)
+    fields=fields_helper(request)
+    if fields:
+        seri = serializer(page,many=True,fields=fields)
+    else:
+        seri = serializer(page,many=True)
 
     return obj.get_paginated_response(seri.data, status=status.HTTP_200_OK)
 
 def getdetails_helper(model:models.Model, request:Request,serializer:ModelSerializer,pk):
     obj = get_object_or_404(model,pk=pk)
-    seri = serializer(obj)
+    fields=fields_helper(request)
+    if fields:
+        seri = serializer(obj,fields=fields)
+    else:
+        seri = serializer(obj)
     return Response(seri.data, status=status.HTTP_200_OK)
 
 def post_helper(model:models.Model, request:Request, serializer:Serializer):
