@@ -11,7 +11,7 @@ class Work(models.Model):
     viber_group = models.CharField(max_length=256,default="https://")
     classcode = models.CharField(max_length=8, default="#code")
     valid_from = models.DateField(default=date(2000,1,1))
-    valid_to = models.DateField(default=date(2000,1,1))
+    valid_to = models.DateField(default=date(2000,12,1))
     status = models.CharField(max_length=32, default="active")
     predecessor = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
 
@@ -30,6 +30,9 @@ class Session(models.Model):
     time_from = models.TimeField(default=(time(16,0,0)))
     time_to = models.TimeField(default=time(18,0,0))
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = "session"
         verbose_name_plural = "sessions"
@@ -38,6 +41,9 @@ class Session(models.Model):
 class StaffWork(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "staffwork relation"
@@ -48,6 +54,9 @@ class StaffWork(models.Model):
 class StaffSession(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "staffsession relation"

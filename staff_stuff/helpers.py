@@ -1,50 +1,38 @@
-from django.db.models import fields
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
-from rest_framework.serializers import ModelSerializer, Serializer
-from rest_framework import serializers, status
-from django.db import models
+from rest_framework import status
 from rest_framework.request import Request
 from .filter import get_filter_query
 
 
-def fields_helper(request:Request):
-    fields = None
-    if "fields" in request.query_params:
-        fields=request.query_params.get("fields")
-    return fields
 
-def getlist_helper(model:models.Model, request:Request, serializer:ModelSerializer, obj):
-    query = get_filter_query(model,request)
-    page = obj.paginate_queryset(query,request)
-    fields=fields_helper(request)
-    if fields:
-        seri = serializer(page,many=True,fields=fields)
-    else:
-        seri = serializer(page,many=True)
 
-    return obj.get_paginated_response(seri.data, status=status.HTTP_200_OK)
+def getlist_helper(self,request:Request):
+    query = get_filter_query(self.model,request,pre=self.related_fields)
+    page = self.paginate_queryset(query,request)
+    
+    seri = self.serializer(page,many=True,fields=request.query_params.get("fields"))
+    
 
-def getdetails_helper(model:models.Model, request:Request,serializer:ModelSerializer,pk):
-    obj = get_object_or_404(model,pk=pk)
-    fields=fields_helper(request)
-    if fields:
-        seri = serializer(obj,fields=fields)
-    else:
-        seri = serializer(obj)
+    return self.get_paginated_response(seri.data, status=status.HTTP_200_OK)
+
+def getdetails_helper(self,request:Request,obj_id):
+    obj = get_object_or_404(self.model,pk=obj_id)
+    seri = self.serializer(obj,fields=request.query_params.get("fields"))
+    
     return Response(seri.data, status=status.HTTP_200_OK)
 
-def post_helper(model:models.Model, request:Request, serializer:Serializer):
-        seri = serializer(data=request.data)
+def post_helper(self, request:Request):
+        seri = self.serializer(data=request.data)
         if seri.is_valid():
+
             seri.save()
             return Response(seri.data, status=status.HTTP_201_CREATED)
         return Response(seri.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def put_helper(model:models.Model, request:Request, serializer:Serializer, pk):
-    obj = get_object_or_404(model,pk=pk)
-    seri = serializer(obj,data=request.data,partial=True)
+def put_helper(self,request:Request, obj_id):
+    obj = get_object_or_404(self.model,pk=obj_id)
+    seri = self.serializer(obj,data=request.data,partial=True)
     
     if seri.is_valid():
         seri.save()
@@ -53,9 +41,9 @@ def put_helper(model:models.Model, request:Request, serializer:Serializer, pk):
     return Response(seri.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def delete_helper(model:models.Model, request:Request, serializer:Serializer, pk):
-    obj = get_object_or_404(model,pk=pk)
-    seri = serializer(obj).data
+def delete_helper(self,request:Request, obj_id):
+    obj = get_object_or_404(self.model,pk=obj_id)
+    seri = self.serializer(obj).data
     obj.delete()
 
     return Response(seri, status=status.HTTP_200_OK)

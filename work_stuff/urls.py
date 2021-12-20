@@ -1,6 +1,7 @@
 from django.urls import path, include
 from work_stuff import views
 
+
 urlpatterns = [
     path("work", views.WorkList.as_view()),
     path("work/<int:obj_id>", views.WorkDetails.as_view()),
@@ -10,5 +11,7 @@ urlpatterns = [
     path("staffwork/<int:obj_id>", views.StaffWorkDetails.as_view()),
     path("staffsession", views.StaffSessionList.as_view()),
     path("staffsession/<int:obj_id>", views.StaffSessionDetails.as_view()),
+
+ 
     
 ]

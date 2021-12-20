@@ -1,4 +1,3 @@
-from re import S
 from rest_framework import serializers
 from .models import Work, StaffWork, Session, StaffSession
 from staff_stuff.models import Staff
@@ -27,9 +26,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
-            
-        
-        
+             
 
 class StaffOnlySerializer(serializers.ModelSerializer):
     
@@ -47,7 +44,11 @@ class SessionSerializer(DynamicFieldsModelSerializer):
         model = Session
         fields = "__all__"
 
-class StaffSessionOnlySerializer(serializers.ModelSerializer):
+
+class StaffSessionSerializer(DynamicFieldsModelSerializer):
+    staff_details = StaffOnlySerializer(read_only=True)
+    session_details = SessionSerializer(read_only=True)
+
     def validate(self, data):
         s = data["staff"]
         se = data["session"]
@@ -61,14 +62,6 @@ class StaffSessionOnlySerializer(serializers.ModelSerializer):
         model = StaffSession
         fields = "__all__"
 
-class StaffSessionSerializer(DynamicFieldsModelSerializer):
-    staff = StaffOnlySerializer(read_only=True)
-    session = SessionSerializer(read_only=True)
-
-    class Meta:
-        model = StaffSession
-        fields = "__all__"
-
 
 class StaffSessionSerializerSession(serializers.ModelSerializer):
     session = SessionSerializer(read_only=True)
@@ -78,7 +71,10 @@ class StaffSessionSerializerSession(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class StaffWorkOnlySerializer(serializers.ModelSerializer):
+class StaffWorkSerializer(DynamicFieldsModelSerializer):
+    staff_details = StaffOnlySerializer(read_only=True)
+    work_details = WorkOnlySerializer(read_only=True)
+
     def validate(self, data):
         s = data["staff"]
         w = data["work"]
@@ -86,15 +82,6 @@ class StaffWorkOnlySerializer(serializers.ModelSerializer):
         if obj is not None:
             raise serializers.ValidationError("Instance already exists.")
         return data
-    class Meta:
-        model = StaffWork
-        fields = "__all__"
-
-class StaffWorkSerializer(DynamicFieldsModelSerializer):
-    staff = StaffOnlySerializer(read_only=True)
-    work = WorkOnlySerializer(read_only=True)
-    session = SessionSerializer()
-
     class Meta:
         model = StaffWork
         fields = "__all__"

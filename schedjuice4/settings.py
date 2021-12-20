@@ -25,9 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-w=mhlz%5h7*%47irg#yvts$=yihs$)!7)0t0=jbz*!z#)h-if^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG",default=False,cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "api.teachersucenter.com",
+    config("DBHOST")
+]
 
 
 # Application definition
@@ -40,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "rest_framework",
+    "corsheaders",
+    "debug_toolbar",
     "reminder",
     "staff_stuff",
     "work_stuff",
@@ -56,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'schedjuice4.urls'
@@ -152,8 +159,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER=config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD=config("EMAIL_HOST_PASSWORD")
-#EMAIL_HOST_USER = "your_account@gmail.com"
-#EMAIL_HOST_PASSWORD = "your account’s password
 
 
 # Celery stuffs
@@ -167,7 +172,35 @@ CELERY_TIMEZONE = "Asia/Rangoon"
 CELERY_IGNORE_RESULT = False
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
+# Rest configurations
+
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTTokenUserAuthentication',
+    ],
 }
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+# JWT stuffs
+SIMPLE_JWT = {
+    "SIGNING_KEY":config("JWT")
+}
+
+
+# CORS stuffs
+
+CORS_ALLOW_ORIGINS=[
+    "http://127.0.0.1:8080",
+    "https://127.0.0.1:8080",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:8000",
+    "http://127.0.0.1:8001",
+    "http://127.0.0.1:8001",
+    "http://18.140.5.9",
+    "https://18.140.5.9",
+]

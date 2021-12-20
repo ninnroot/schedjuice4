@@ -9,7 +9,7 @@ logger = get_task_logger(__name__)
 app.conf.beat_schedule={
     
     "repopulate": {
-        "task": "send_mail_task",
+        "task": "repopulate",
         "schedule": crontab(minute=0, hour=0),
     
     }

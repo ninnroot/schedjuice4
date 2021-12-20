@@ -4,7 +4,7 @@ from rest_framework.request import Request
 # default django filter-backend needs the use of GenericViews, 
 # so I wrote one myself. ez.
 
-def get_filter_query(model:models.Model,request:Request):
+def get_filter_query(model:models.Model,request:Request,pre=[]):
     q =  {k:v for k, v in request.GET.items() if v}
     
     fields = set([i.name for i in model._meta.get_fields()])
@@ -12,7 +12,7 @@ def get_filter_query(model:models.Model,request:Request):
     
     for i in invalid_keys:
         q.pop(i,None)
-    return model.objects.filter(**q)
+    return model.objects.filter(**q).prefetch_related(*pre)
 
 
 

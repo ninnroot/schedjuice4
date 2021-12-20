@@ -1,4 +1,5 @@
 
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from work_stuff.serializers import StaffSessionSerializerSession
@@ -31,28 +32,10 @@ class TagOnlySerializer(serializers.ModelSerializer):
 
 
 
-class StaffTagOnlySerializer(serializers.ModelSerializer):    
+class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
+    staff_details = StaffOnlySerializer(read_only=True)
+    department_details = DepartmentOnlySerializer(read_only=True)
 
-    def validate(self, data):
-        s = data["staff"]
-        t = data["tag"]
-        pos = data["pos"]
-        obj = StaffTag.objects.filter(staff=s,tag=t).first()
-        if obj is not None:
-            raise serializers.ValidationError("Instance already exists.")
-
-        obj = StaffTag.objects.filter(staff=s,pos=pos).first()
-        if obj is not None:
-            raise serializers.ValidationError({"pos":"The index is already taken."})
-        return data
-
-    class Meta:
-        model = StaffTag
-        fields = "__all__"
-        dept=1
-
-class StaffDepartmentOnlySerializer(serializers.ModelSerializer):
-    
     def validate(self, data):
         s = data["staff"]
         d = data["department"]
@@ -78,19 +61,21 @@ class StaffDepartmentOnlySerializer(serializers.ModelSerializer):
         fields = "__all__"
         dept=1
 
-class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
-    staff = StaffOnlySerializer(read_only=True)
-    department = DepartmentOnlySerializer(read_only=True)
-
-    class Meta:
-        model = StaffDepartment
-        fields = "__all__"
-        dept=1
-
 class StaffTagSerializer(DynamicFieldsModelSerializer):    
-    staff = StaffOnlySerializer(read_only=True)
-    tag = TagOnlySerializer(read_only=True)
+    staff_details = StaffOnlySerializer(read_only=True)
+    tag_details = TagOnlySerializer(read_only=True)
+    def validate(self, data):
+        s = data["staff"]
+        t = data["tag"]
+        pos = data["pos"]
+        obj = StaffTag.objects.filter(staff=s,tag=t).first()
+        if obj is not None:
+            raise serializers.ValidationError("Instance already exists.")
 
+        obj = StaffTag.objects.filter(staff=s,pos=pos).first()
+        if obj is not None:
+            raise serializers.ValidationError({"pos":"The index is already taken."})
+        return data
     class Meta:
         model = StaffTag
         fields = "__all__"
@@ -133,6 +118,12 @@ class StaffSerializer(DynamicFieldsModelSerializer):
     staffworks = StaffWorkSerializerWork(source="staffwork_set", many=True, read_only=True)
     staffsessions = StaffSessionSerializerSession(source="staffsession_set", many=True, read_only=True)
     
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = super().create(validated_data)
+        user.set_password(password)
+        user.save()
+        return user
     class Meta:
         model = Staff
         fields= "__all__"
