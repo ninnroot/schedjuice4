@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import datetime
 from pathlib import Path
 from decouple import config
 from celery.schedules import crontab
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     "reminder",
     "staff_stuff",
     "work_stuff",
+    "wiki",
 
     # add this at last
     "django_cleanup.apps.CleanupConfig"
@@ -189,6 +191,11 @@ INTERNAL_IPS = [
 
 # JWT stuffs
 SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=7),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
     "SIGNING_KEY":config("JWT")
 }
 

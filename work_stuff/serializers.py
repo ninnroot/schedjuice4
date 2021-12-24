@@ -1,5 +1,7 @@
+from django.db import models
+from django.db.models.lookups import Transform
 from rest_framework import serializers
-from .models import Work, StaffWork, Session, StaffSession
+from .models import Work, StaffWork, Session, StaffSession, Category
 from staff_stuff.models import Staff
 
 
@@ -27,6 +29,12 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
              
+
+class CategoryOnlySerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Category
+        fields = "__all__"
 
 class StaffOnlySerializer(serializers.ModelSerializer):
     
@@ -99,10 +107,18 @@ class StaffWorkSerializerWork(serializers.ModelSerializer):
         model = StaffWork
         fields = "__all__"
 
+class CategorySerializer(DynamicFieldsModelSerializer):
+    works = WorkOnlySerializer(read_only=True,many=True)
+
+    class Meta:
+        model = Category
+        fields = "__all__"
+
 class WorkSerializer(DynamicFieldsModelSerializer):
     staffworks = StaffWorkSerializerStaff(source="staffwork_set", many=True, read_only=True)
     sessions = SessionSerializer(source="session_set", many=True, read_only=True)
-    
+    category = CategoryOnlySerializer(read_only=True)
+
     class Meta:
         model = Work
         fields = "__all__"

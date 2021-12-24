@@ -8,6 +8,9 @@ from .filter import get_filter_query
 
 
 def getlist_helper(self,request:Request):
+    
+    if not hasattr(self,"related_fields"):
+        self.related_fields = []
     query = get_filter_query(self.model,request,pre=self.related_fields)
     page = self.paginate_queryset(query,request)
     

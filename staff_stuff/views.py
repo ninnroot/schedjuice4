@@ -42,7 +42,7 @@ class StaffList(GeneralList):
         "user_permissions","groups"
     ]    
 
-class StaffDetails(GeneralList):
+class StaffDetails(GeneralDetails):
     model = Staff
     serializer = StaffSerializer
 

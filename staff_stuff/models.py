@@ -10,6 +10,7 @@ from .managers import UserManager
 class Department(models.Model):
 
     name = models.CharField(max_length=256)
+    description = models.TextField()
     is_under = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,12 +27,15 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     dname = models.CharField(max_length=128, default="Display Name")
     ename = models.CharField(max_length=128, default="Nickname")
     description = models.TextField(default="Description...")
+    # statues = ["unapproved","active","retired","on leave"]
+    status = models.CharField(max_length=128, default="unapproved")
     dob = models.DateField(default=date(2000,1,1))
     gender = models.CharField(max_length=16,default="")
     ph_num = models.CharField(max_length=60,default="09650222", validators=[RegexValidator(r'^\d{1,11}$')])
     facebook = models.CharField(max_length=256, default="https://facebook.com/profile")
     region = models.CharField(max_length=8, default="0")
     profile_pic = models.ImageField(default="profile_pics/default.jpg", upload_to="profile_pics") 
+    cover_pic = models.ImageField(default="cover_pics/default.jpg", upload_to="cover_pics")
     first_day = models.DateField(default=date(2018,1,1))
     
     created_at = models.DateTimeField(auto_now_add=True)

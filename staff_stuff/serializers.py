@@ -83,14 +83,14 @@ class StaffTagSerializer(DynamicFieldsModelSerializer):
 
 
 class StaffTagSerializerTag(serializers.ModelSerializer):    
-    tag = TagOnlySerializer(read_only=True)
+    tags = TagOnlySerializer(read_only=True,many=True)
     class Meta:
         model = StaffTag
         fields = "__all__"
         dept=1
 
 class StaffTagSerializerStaff(serializers.ModelSerializer):    
-    staff = StaffOnlySerializer(read_only=True)
+    staffs = StaffOnlySerializer(read_only=True,many=True)
     class Meta:
         model = StaffTag
         fields = "__all__"
@@ -119,11 +119,14 @@ class StaffSerializer(DynamicFieldsModelSerializer):
     staffsessions = StaffSessionSerializerSession(source="staffsession_set", many=True, read_only=True)
     
     def create(self, validated_data):
+        
         password = validated_data.pop('password')
         user = super().create(validated_data)
         user.set_password(password)
         user.save()
+
         return user
+
     class Meta:
         model = Staff
         fields= "__all__"
