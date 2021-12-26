@@ -62,7 +62,7 @@ class TopicSerializer(DynamicFieldsModelSerializer):
         fields = "__all__"
 
 
-class TopicSerializerWithChildren(serializers.ModelSerializer):
+class TopicSerializerWithChildren(DynamicFieldsModelSerializer):
     
     children = TopicSerializer(source="parent_set", many=True, read_only=True)
     tags = TagOnlySerializer(source="tag_set", many=True, read_only=True)
