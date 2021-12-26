@@ -17,7 +17,7 @@ class TopicTag(models.Model):
 
 class Topic(models.Model):
 
-    title = models.CharField(max_length=256)
+    title = models.CharField(max_length=256,unique=True)
     content = models.TextField()
     parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     index = models.IntegerField()
