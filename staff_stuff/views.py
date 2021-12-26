@@ -41,7 +41,7 @@ class StaffList(GeneralList):
         "stafftag_set","staffdepartment_set",
         "user_permissions","groups"
     ]
-    permission_classes = [IsAuthenticated]
+    
 
 class StaffDetails(GeneralDetails):
     model = Staff
@@ -55,7 +55,7 @@ class DepartmentList(GeneralList):
     related_fields = [
         "staffdepartment_set"
     ]
-    
+    permission_classes = [IsAuthenticated]
 
 
 class DepartmentDetails(GeneralDetails):
