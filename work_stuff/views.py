@@ -54,3 +54,5 @@ class StaffWorkDetails(GeneralDetails):
     model = StaffWork
     serializer = StaffWorkSerializer
 
+
+

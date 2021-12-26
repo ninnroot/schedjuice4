@@ -17,6 +17,8 @@ class Category(models.Model):
         verbose_name_plural = "categories"
         ordering = ["-id"]
 
+
+
 class Work(models.Model):
 
     name = models.CharField(max_length=256)
@@ -55,6 +57,8 @@ class Session(models.Model):
         verbose_name = "session"
         verbose_name_plural = "sessions"
         ordering = ["-id"]
+
+
 
 class StaffWork(models.Model):
 
