@@ -42,6 +42,20 @@ class TopicSerializer(DynamicFieldsModelSerializer):
 
         return topic
 
+    def update(self, instance, data):
+        p=instance.parent
+        i=data.get("index")
+        smaller = Topic.objects.filter(parent=p,index__lt=i, index__gt=instance.index).all()
+
+        for i in smaller:
+            i.index -=1
+        Topic.objects.bulk_update(smaller,["index"])
+        instance.index = i
+        instance.save()
+
+        return instance
+
+
 
     class Meta:
         model = Topic

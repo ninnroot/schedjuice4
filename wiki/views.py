@@ -8,13 +8,12 @@ from .models import Topic, TopicTag
 class TopicList(GeneralList):
     model = Topic
     serializer = TopicSerializer
-    related_fields = ["tag_set"]
     
 
 class TopicDetails(GeneralDetails):
     model = Topic
     serializer = TopicSerializerWithChildren
-    related_fields = ["parent_set", "tag_set"]
+
 
 
 class TopicTagList(GeneralList):
