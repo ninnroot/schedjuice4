@@ -17,8 +17,8 @@ class TopicTag(models.Model):
 
 class Topic(models.Model):
 
-    title = models.CharField(max_length=256,unique=True)
-    content = models.TextField()
+    title = models.JSONField()
+    content = models.JSONField()
     parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     index = models.IntegerField()
     image = models.ImageField(null=True, upload_to="topic_pics")

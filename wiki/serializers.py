@@ -31,29 +31,24 @@ class TopicSerializer(DynamicFieldsModelSerializer):
     def create(self, data):
         p = data.get("parent")
         i = data.get("index")
-        bigger = Topic.objects.filter(parent=p,index__gt=i).all()
+        print(i)
+        if p is None:
+
+            bigger = Topic.objects.filter(parent__isnull=True,index__gte=i).all()
+        else:
+            bigger = Topic.objects.filter(parent=p,index__gte=i).all()
 
         for i in bigger:
             i.index +=1
-        Topic.objects.bulk_update(bigger,["index"])
+            i.save()
+        
         
         topic = super().create(data)
         topic.save()
 
         return topic
 
-    def update(self, instance, data):
-        p=instance.parent
-        i=data.get("index")
-        smaller = Topic.objects.filter(parent=p,index__lt=i, index__gt=instance.index).all()
-
-        for i in smaller:
-            i.index -=1
-        Topic.objects.bulk_update(smaller,["index"])
-        instance.index = i
-        instance.save()
-
-        return instance
+    
 
 
 
@@ -66,7 +61,23 @@ class TopicSerializerWithChildren(DynamicFieldsModelSerializer):
     
     children = TopicSerializer(source="parent_set", many=True, read_only=True)
     tags = TagOnlySerializer(source="tag_set", many=True, read_only=True)
-    
+
+    def update(self, instance, data):
+        p=instance.parent
+        i=data.get("index")
+        if p is None:
+            smaller = Topic.objects.filter(parent__isnull=True,index__lt=i, index__gt=instance.index).all()
+
+        else:
+            smaller = Topic.objects.filter(parent=p,index__lt=i, index__gt=instance.index).all()
+
+        for i in smaller:
+            i.objects.update(index=i.index-1)
+            i.save()
+        instance.index = i
+        instance.save()
+
+        return instance
 
     class Meta:
         model = Topic
