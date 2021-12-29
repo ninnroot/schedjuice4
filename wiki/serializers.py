@@ -31,7 +31,6 @@ class TopicSerializer(DynamicFieldsModelSerializer):
     def create(self, data):
         p = data.get("parent")
         i = data.get("index")
-        print(i)
         if p is None:
 
             bigger = Topic.objects.filter(parent__isnull=True,index__gte=i).all()
@@ -64,18 +63,29 @@ class TopicSerializerWithChildren(DynamicFieldsModelSerializer):
 
     def update(self, instance, data):
         p=instance.parent
-        i=data.get("index")
-        if p is None:
-            smaller = Topic.objects.filter(parent__isnull=True,index__lt=i, index__gt=instance.index).all()
+        i=data.get("index")        
 
-        else:
-            smaller = Topic.objects.filter(parent=p,index__lt=i, index__gt=instance.index).all()
+        if i:
 
-        for i in smaller:
-            i.objects.update(index=i.index-1)
-            i.save()
-        instance.index = i
-        instance.save()
+            def f(lst):
+                for i in lst:
+                    i.objects.update(index=i.index-1)
+                    i.save()
+
+
+            if p is None and i>instance.index:
+                f(Topic.objects.filter(parent__isnull=True,index__lt=i, index__gt=instance.index).all())
+
+            elif p is None and i<instance.index:
+                f(Topic.objects.filter(parent__isnull=True,index__gt=i, index__lt=instance.index).all())
+
+            elif p is not None and i>instance.index:
+                f(Topic.objects.filter(parent=p,index__lte=i, index__gt=instance.index).all())
+
+            elif p is not None and i<instance.index:
+                f(Topic.objects.filter(parent=p,index__gt=i, index__lte=instance.index).all())
+                instance.index = i
+                instance.save()
 
         return instance
 
