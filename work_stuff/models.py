@@ -21,11 +21,11 @@ class Category(models.Model):
 
 class Work(models.Model):
 
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=256,unique=True)
     description = models.TextField(default="Description...")
     meeting_id = models.CharField(max_length=20,default="not provided",validators=[RegexValidator(r'^\d{1,11}$ ')])
     viber_group = models.CharField(max_length=256,default="https://")
-    classcode = models.CharField(max_length=8, default="#code")
+    class_code = models.CharField(max_length=8, default="#code")
     valid_from = models.DateField(default=date(2000,1,1))
     valid_to = models.DateField(default=date(2000,12,1))
     # statuses = ["pending","active", "ended", "on halt"]

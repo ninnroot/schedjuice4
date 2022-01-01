@@ -9,7 +9,7 @@ from .managers import UserManager
 
 class Department(models.Model):
 
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=256, unique=True)
     description = models.TextField()
     is_under = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
 
