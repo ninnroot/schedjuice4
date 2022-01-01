@@ -36,6 +36,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     region = models.CharField(max_length=8, default="0")
     profile_pic = models.ImageField(default="profile_pics/default.jpg", upload_to="profile_pics") 
     cover_pic = models.ImageField(default="cover_pics/default.jpg", upload_to="cover_pics")
+    card_pic = models.ImageField(default="card_pics/default.jpg", upload_to="card_pics")
     first_day = models.DateField(default=date(2018,1,1))
     
     created_at = models.DateTimeField(auto_now_add=True)
