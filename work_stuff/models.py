@@ -28,7 +28,7 @@ class Work(models.Model):
     class_code = models.CharField(max_length=8, default="#code")
     valid_from = models.DateField(default=date(2000,1,1))
     valid_to = models.DateField(default=date(2000,12,1))
-    # statuses = ["pending","active", "ended", "on halt"]
+    # statuses = ["pending", "ready" ,"active", "ended", "on halt"]
     status = models.CharField(max_length=32, default="active")
     predecessor = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     cover_pic = models.ImageField(default="work_covers/default.jpg", upload_to="work_covers")

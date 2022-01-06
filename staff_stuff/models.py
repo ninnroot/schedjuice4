@@ -27,7 +27,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     dname = models.CharField(max_length=128, default="Display Name")
     ename = models.CharField(max_length=128, default="Nickname")
     description = models.TextField(default="Description...")
-    # statues = ["unapproved","active","retired","on leave"]
+    # statues = ["in progress:0-3", "unapproved","active","retired","on leave"]
     status = models.CharField(max_length=128, default="unapproved")
     dob = models.DateField(default=date(2000,1,1))
     gender = models.CharField(max_length=16,default="")
