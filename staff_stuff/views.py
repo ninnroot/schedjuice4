@@ -55,12 +55,12 @@ class DepartmentList(GeneralList):
     related_fields = [
         "staffdepartment_set"
     ]
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
 
 
 class DepartmentDetails(GeneralDetails):
     model = Department
-    serializers = DepartmentSerializer
+    serializer = DepartmentSerializer
 
 
 

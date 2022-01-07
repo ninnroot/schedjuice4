@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import fields
 from django.db.models.lookups import Transform
 from rest_framework import serializers
 from .models import Work, StaffWork, Session, StaffSession, Category
@@ -30,19 +31,19 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
              
 
-class CategoryOnlySerializer(serializers.ModelSerializer):
+class CategoryOnlySerializer(DynamicFieldsModelSerializer):
     
     class Meta:
         model = Category
         fields = "__all__"
 
-class StaffOnlySerializer(serializers.ModelSerializer):
+class StaffOnlySerializer(DynamicFieldsModelSerializer):
     
     class Meta:
         model = Staff
         fields = "__all__"
 
-class WorkOnlySerializer(serializers.ModelSerializer):
+class WorkOnlySerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Work
         fields = "__all__"
@@ -54,8 +55,8 @@ class SessionSerializer(DynamicFieldsModelSerializer):
 
 
 class StaffSessionSerializer(DynamicFieldsModelSerializer):
-    staff_details = StaffOnlySerializer(read_only=True)
-    session_details = SessionSerializer(read_only=True)
+    staff_details = StaffOnlySerializer(source="staff", fields="id,email,dname,ename,profile_pic,card_pic",read_only=True)
+    session_details = SessionSerializer(source="session",fields="id,work,day,time_from,time_to", read_only=True)
 
     def validate(self, data):
         s = data["staff"]
@@ -66,22 +67,16 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
         if obj is None:
             raise serializers.ValidationError("Staff is not related to Session's Work.")
         return data
-    class Meta:
-        model = StaffSession
-        fields = "__all__"
-
-
-class StaffSessionSerializerSession(serializers.ModelSerializer):
-    session = SessionSerializer(read_only=True)
 
     class Meta:
         model = StaffSession
         fields = "__all__"
+
 
 
 class StaffWorkSerializer(DynamicFieldsModelSerializer):
-    staff_details = StaffOnlySerializer(read_only=True)
-    work_details = WorkOnlySerializer(read_only=True)
+    staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,profile_pic,card_pic", read_only=True)
+    work_details = WorkOnlySerializer(source="work", fields="id,name", read_only=True)
 
     def validate(self, data):
         s = data["staff"]
@@ -94,18 +89,6 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
         model = StaffWork
         fields = "__all__"
 
-class StaffWorkSerializerStaff(serializers.ModelSerializer):
-    staff = StaffOnlySerializer(read_only=True)
-
-    class Meta:
-        model = StaffWork
-        fields = "__all__"
-
-class StaffWorkSerializerWork(serializers.ModelSerializer):
-    work = WorkOnlySerializer(read_only=True)
-    class Meta:
-        model = StaffWork
-        fields = "__all__"
 
 class CategorySerializer(DynamicFieldsModelSerializer):
     works = WorkOnlySerializer(read_only=True,many=True)
@@ -115,7 +98,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
         fields = "__all__"
 
 class WorkSerializer(DynamicFieldsModelSerializer):
-    staffworks = StaffWorkSerializerStaff(source="staffwork_set", many=True, read_only=True)
+    staff = StaffWorkSerializer(source="staffwork_set",fields="id,staff_details" , many=True, read_only=True)
     sessions = SessionSerializer(source="session_set", many=True, read_only=True)
     category = CategoryOnlySerializer(read_only=True)
 

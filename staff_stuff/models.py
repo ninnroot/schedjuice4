@@ -5,7 +5,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.validators import RegexValidator
 from .managers import UserManager
-
+import random
 
 class Department(models.Model):
 
@@ -26,6 +26,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     dname = models.CharField(max_length=128, default="Display Name")
     ename = models.CharField(max_length=128, default="Nickname")
+    uname = models.SlugField(max_length=128, unique=True, validators=[RegexValidator(r"^[a-zA-Z0-9_]*$")])
     description = models.TextField(default="Description...")
     # statues = ["in progress:0-3", "unapproved","active","retired","on leave"]
     status = models.CharField(max_length=128, default="unapproved")

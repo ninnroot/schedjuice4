@@ -12,6 +12,7 @@ def get_filter_query(model:models.Model,request:Request,pre=[]):
     
     for i in invalid_keys:
         q.pop(i,None)
+
     return model.objects.filter(**q).prefetch_related(*pre)
 
 

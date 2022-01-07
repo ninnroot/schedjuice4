@@ -1,29 +1,30 @@
 
 from django.contrib.auth.hashers import make_password
+from django.db.models import fields
 from rest_framework import serializers
 
-from work_stuff.serializers import StaffSessionSerializerSession
+from work_stuff.serializers import StaffSessionSerializer
 
 from .models import Department, Staff, Tag, StaffTag, StaffDepartment
-from work_stuff.serializers import StaffWorkSerializerWork, DynamicFieldsModelSerializer
+from work_stuff.serializers import StaffWorkSerializer, DynamicFieldsModelSerializer
 
 
 
 # Only-serializers
 
-class DepartmentOnlySerializer(serializers.ModelSerializer):
+class DepartmentOnlySerializer(DynamicFieldsModelSerializer):
     
     class Meta:
         model = Department
         fields = "__all__"
 
-class StaffOnlySerializer(serializers.ModelSerializer):
+class StaffOnlySerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model = Staff
         fields = "__all__"
 
-class TagOnlySerializer(serializers.ModelSerializer):
+class TagOnlySerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model = Tag
@@ -33,8 +34,34 @@ class TagOnlySerializer(serializers.ModelSerializer):
 
 
 class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
-    staff_details = StaffOnlySerializer(read_only=True)
-    department_details = DepartmentOnlySerializer(read_only=True)
+    staff_details = StaffOnlySerializer(source="staff", fields="id,dname,ename,profile_pic,email,card_pic",read_only=True)
+    department_details = DepartmentOnlySerializer(source="department", fields="id,name", read_only=True)
+
+    def update(self, instance, data):
+        s = instance.staff
+        pre = instance.pos
+        nex = data.get("pos")
+
+        def f(lst):
+            for i in lst:
+                i.objects.update(pos=i.pos-1)
+                i.save()
+
+        if pre > nex:
+            f(StaffDepartment.objects.filter(staff=s,pos_lt=pre,pos_gte=nex).all())
+        
+        elif nex > pre:
+            f(StaffDepartment.objects.filter(staff=s,pos_gt=pre,pos_lte=nex).all())
+
+        else:
+            
+            return instance
+
+        instance.pos = nex
+        instance.save()
+
+        return instance
+
 
     def validate(self, data):
         s = data["staff"]
@@ -59,11 +86,36 @@ class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = StaffDepartment
         fields = "__all__"
-        dept=1
 
 class StaffTagSerializer(DynamicFieldsModelSerializer):    
-    staff_details = StaffOnlySerializer(read_only=True)
-    tag_details = TagOnlySerializer(read_only=True)
+    staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,profile_pic,card_pic", read_only=True)
+    tag_details = TagOnlySerializer(source="tag",fields="id,name,color", read_only=True)
+    
+    def update(self,instance,data):
+        s = instance.staff
+        pre = instance.pos
+        nex = data.get("pos")
+
+        def f(lst):
+            for i in lst:
+                i.objects.update(pos=i.pos-1)
+                i.save()
+
+        if pre > nex:
+            f(StaffTag.objects.filter(staff=s,pos_lt=pre,pos_gte=nex).all())
+        
+        elif nex > pre:
+            f(StaffTag.objects.filter(staff=s,pos_gt=pre,pos_lte=nex).all())
+
+        else:
+            
+            return instance
+
+        instance.pos = nex
+        instance.save()
+
+        return instance
+
     def validate(self, data):
         s = data["staff"]
         t = data["tag"]
@@ -82,41 +134,11 @@ class StaffTagSerializer(DynamicFieldsModelSerializer):
         dept=1
 
 
-class StaffTagSerializerTag(serializers.ModelSerializer):    
-    tags = TagOnlySerializer(read_only=True,many=True)
-    class Meta:
-        model = StaffTag
-        fields = "__all__"
-        dept=1
-
-class StaffTagSerializerStaff(serializers.ModelSerializer):    
-    staffs = StaffOnlySerializer(read_only=True,many=True)
-    class Meta:
-        model = StaffTag
-        fields = "__all__"
-        dept=1
-
-class StaffDepartmentSerializerStaff(serializers.ModelSerializer):
-    staff = StaffOnlySerializer(read_only=True)
-
-    class Meta:
-        model = StaffDepartment
-        fields = "__all__"
-        dept=1
-
-class StaffDepartmentSerializerDept(serializers.ModelSerializer):
-    departments = DepartmentOnlySerializer(read_only=True)
-
-    class Meta:
-        model = StaffDepartment
-        fields = "__all__"
-        dept=1
-
 class StaffSerializer(DynamicFieldsModelSerializer):
-    staffdepartments = StaffDepartmentSerializerDept(source="staffdepartment_set", many=True,read_only=True)
-    stafftags = StaffTagSerializerTag(source="stafftag_set", many=True,read_only=True)
-    staffworks = StaffWorkSerializerWork(source="staffwork_set", many=True, read_only=True)
-    staffsessions = StaffSessionSerializerSession(source="staffsession_set", many=True, read_only=True)
+    departments = StaffDepartmentSerializer(source="staffdepartment_set", fields="id,pos,department_details", many=True,read_only=True)
+    tags = StaffTagSerializer(source="stafftag_set",fields="id,pos,tag_details", many=True,read_only=True)
+    works = StaffWorkSerializer(source="staffwork_set",fields="id,work_details", many=True, read_only=True)
+    sessions = StaffSessionSerializer(source="staffsession_set",fields="id,session_details", many=True, read_only=True)
     
     def create(self, validated_data):
         
@@ -133,13 +155,13 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         dept = 1
 
 class DepartmentSerializer(DynamicFieldsModelSerializer):
-    staffdepartments = StaffDepartmentSerializerStaff(source="staffdepartment_set",many=True,read_only=True)
+    staff = StaffDepartmentSerializer(source="staffdepartment_set",fields="id,pos,staff_details",many=True,read_only=True)
     class Meta:
         model = Department
         fields = "__all__"
        
 class TagSerializer(DynamicFieldsModelSerializer):
-    stafftags = StaffTagSerializerStaff(source="stafftag_set",many=True, read_only=True)
+    staff = StaffTagSerializer(source="stafftag_set", fields="id,pos,staff_details" ,many=True, read_only=True)
 
     class Meta:
         model = Tag

@@ -84,8 +84,9 @@ class TopicSerializerWithChildren(DynamicFieldsModelSerializer):
 
             elif p is not None and i<instance.index:
                 f(Topic.objects.filter(parent=p,index__gt=i, index__lte=instance.index).all())
-                instance.index = i
-                instance.save()
+            
+            instance.index = i
+            instance.save()
 
         return instance
 
