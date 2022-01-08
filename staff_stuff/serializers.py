@@ -1,12 +1,12 @@
 
 from django.contrib.auth.hashers import make_password
-from django.db.models import fields
-from rest_framework import serializers
 
+from rest_framework import serializers
+from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from work_stuff.serializers import StaffSessionSerializer
 
 from .models import Department, Staff, Tag, StaffTag, StaffDepartment
-from work_stuff.serializers import StaffWorkSerializer, DynamicFieldsModelSerializer
+from work_stuff.serializers import StaffWorkSerializer
 
 
 
@@ -34,7 +34,7 @@ class TagOnlySerializer(DynamicFieldsModelSerializer):
 
 
 class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
-    staff_details = StaffOnlySerializer(source="staff", fields="id,dname,ename,profile_pic,email,card_pic",read_only=True)
+    staff_details = StaffOnlySerializer(source="staff", fields="id,dname,ename,uname,profile_pic,email,card_pic",read_only=True)
     department_details = DepartmentOnlySerializer(source="department", fields="id,name", read_only=True)
 
     def update(self, instance, data):
@@ -88,7 +88,7 @@ class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
         fields = "__all__"
 
 class StaffTagSerializer(DynamicFieldsModelSerializer):    
-    staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,profile_pic,card_pic", read_only=True)
+    staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,uname,profile_pic,card_pic", read_only=True)
     tag_details = TagOnlySerializer(source="tag",fields="id,name,color", read_only=True)
     
     def update(self,instance,data):
@@ -139,13 +139,33 @@ class StaffSerializer(DynamicFieldsModelSerializer):
     tags = StaffTagSerializer(source="stafftag_set",fields="id,pos,tag_details", many=True,read_only=True)
     works = StaffWorkSerializer(source="staffwork_set",fields="id,work_details", many=True, read_only=True)
     sessions = StaffSessionSerializer(source="staffsession_set",fields="id,session_details", many=True, read_only=True)
-    
+    _status_lst = [
+            "in progress:0",
+            "in progress:1",
+            "in progress:2",
+            "in progress:3",
+            "unapproved",
+            "active",
+            "retired",
+            "on halt"
+        ]
+
+    def validate(self, data):
+        status = data.get("status")
+        if not status_check(status, self._status_lst):
+            raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
+
+        return super().validate(data)
+
     def create(self, validated_data):
         
+
         password = validated_data.pop('password')
         user = super().create(validated_data)
         user.set_password(password)
         user.save()
+
+        return user
 
         return user
 

@@ -5,6 +5,8 @@ from celery.schedules import crontab
 import requests
 logger = get_task_logger(__name__)
 
+# IMPORTANT !
+# after modifying tasks, don't forget to restart the celery services on the server.
 
 app.conf.beat_schedule={
     

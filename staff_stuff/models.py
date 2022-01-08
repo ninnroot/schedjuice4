@@ -1,18 +1,17 @@
 from django.db import models
 from datetime import date, time
-from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.validators import RegexValidator
 from .managers import UserManager
-import random
 
 class Department(models.Model):
 
     name = models.CharField(max_length=256, unique=True)
+    shorthand = models.CharField(unique=True,max_length=6)
     description = models.TextField()
     is_under = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
-
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -68,10 +67,12 @@ class Tag(models.Model):
         ordering = ["-id"]
 
 class StaffDepartment(models.Model):
+    
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     pos = models.IntegerField()
     is_primary = models.BooleanField(default=False)
+    is_leader = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

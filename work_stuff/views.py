@@ -1,5 +1,4 @@
-from rest_framework import serializers
-from staff_stuff.views import GeneralList, GeneralDetails
+from schedjuice4.generic_views import GeneralList, GeneralDetails
 from .models import Work, StaffWork, Session, StaffSession, Category
 from .serializers import SessionSerializer,StaffSessionSerializer, WorkSerializer, StaffWorkSerializer, CategorySerializer
 

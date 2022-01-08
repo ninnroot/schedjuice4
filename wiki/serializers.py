@@ -1,7 +1,5 @@
-from rest_framework import serializers
-
 from .models import Topic, TopicTag
-from work_stuff.serializers import DynamicFieldsModelSerializer
+from schedjuice4.serializers import DynamicFieldsModelSerializer
 
 class TagOnlySerializer(DynamicFieldsModelSerializer):
 

@@ -1,11 +1,8 @@
-from django.db.models.fields import related
-from django.shortcuts import render
-from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
-from staff_stuff.views import GeneralList,GeneralDetails
+from schedjuice4.generic_views import GeneralList,GeneralDetails
 from .serializers import TopicSerializer, TopicSerializerWithChildren, TagSerializer
 from .models import Topic, TopicTag
-from staff_stuff.helpers import delete_helper
+
 
 class TopicList(GeneralList):
     model = Topic

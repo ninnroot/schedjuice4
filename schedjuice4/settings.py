@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "reminder",
     "staff_stuff",
     "work_stuff",
+    "role_stuff",
     "wiki",
 
     # add this at last
