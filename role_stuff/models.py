@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class Role(models.Model):
-
+    
     name = models.CharField(max_length=256, unique=True)
     shorthand = models.CharField(max_length=6,unique=True)
     description = models.TextField(default="...")

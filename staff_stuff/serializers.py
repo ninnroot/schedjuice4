@@ -120,14 +120,18 @@ class StaffTagSerializer(DynamicFieldsModelSerializer):
         s = data["staff"]
         t = data["tag"]
         pos = data["pos"]
+
         obj = StaffTag.objects.filter(staff=s,tag=t).first()
+
         if obj is not None:
             raise serializers.ValidationError("Instance already exists.")
 
         obj = StaffTag.objects.filter(staff=s,pos=pos).first()
+
         if obj is not None:
             raise serializers.ValidationError({"pos":"The index is already taken."})
         return data
+
     class Meta:
         model = StaffTag
         fields = "__all__"
@@ -161,7 +165,6 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
     def create(self, validated_data):
         
-
         password = validated_data.pop('password')
         user = super().create(validated_data)
         user.set_password(password)
@@ -169,16 +172,31 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
         return user
 
+    def update(self, instance, data):
+        
+        password = data.pop("password", None)
+        if password:
+            instance.set_password(password)
+        
+        instance = super().update(instance,data)
+        instance.save()
+
+        return instance
     class Meta:
         model = Staff
-        exclude = ["password"]
+        fields = "__all__"
+        extra_kwargs = {
+            "password":{"write_only":True}
+        }
         dept = 1
+
 
 class DepartmentSerializer(DynamicFieldsModelSerializer):
     staff = StaffDepartmentSerializer(source="staffdepartment_set",fields="id,pos,staff_details",many=True,read_only=True)
     class Meta:
         model = Department
         fields = "__all__"
+       
        
 class TagSerializer(DynamicFieldsModelSerializer):
     staff = StaffTagSerializer(source="stafftag_set", fields="id,pos,staff_details" ,many=True, read_only=True)

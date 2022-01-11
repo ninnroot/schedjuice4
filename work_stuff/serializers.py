@@ -66,12 +66,15 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
         fields = "__all__"
 
 
+
 class CategorySerializer(DynamicFieldsModelSerializer):
     works = WorkOnlySerializer(read_only=True,many=True)
 
     class Meta:
         model = Category
         fields = "__all__"
+
+
 
 class WorkSerializer(DynamicFieldsModelSerializer):
     staff = StaffWorkSerializer(source="staffwork_set",fields="id,staff_details,role_details" , many=True, read_only=True)

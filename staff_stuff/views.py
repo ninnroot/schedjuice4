@@ -2,7 +2,6 @@ from rest_framework import request
 from rest_framework import permissions
 from schedjuice4.generic_views import GeneralDetails, GeneralList
 from rest_framework.permissions import IsAuthenticated
-\
 from .models import Department, Staff, Tag, StaffTag, StaffDepartment
 from .serializers import (
                         DepartmentSerializer, StaffSerializer,

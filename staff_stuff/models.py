@@ -21,6 +21,8 @@ class Department(models.Model):
         verbose_name_plural = 'departments'
         ordering = ["id"]
 
+
+
 class Staff(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(unique=True)
@@ -82,6 +84,8 @@ class Staff(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'staff members'
         ordering = ["id"]
 
+
+
 class Tag(models.Model):
 
     name = models.CharField(max_length=128, unique=True)
@@ -104,6 +108,8 @@ class Tag(models.Model):
         verbose_name = 'tag'
         verbose_name_plural = 'tags'
         ordering = ["-id"]
+
+
 
 class StaffDepartment(models.Model):
     
@@ -130,6 +136,7 @@ class StaffDepartment(models.Model):
         verbose_name_plural = "staffdepartment relations"
         
         ordering = ["-id"]
+
 
 
 class StaffTag(models.Model):
