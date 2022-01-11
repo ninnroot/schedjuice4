@@ -4,6 +4,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.validators import RegexValidator
 from .managers import UserManager
+from role_stuff.models import Role
 
 class Department(models.Model):
 
@@ -38,6 +39,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     cover_pic = models.ImageField(default="cover_pics/default.jpg", upload_to="cover_pics")
     card_pic = models.ImageField(default="card_pics/default.jpg", upload_to="card_pics")
     first_day = models.DateField(default=date(2018,1,1))
+    role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -47,6 +49,34 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "email",
+            "uname",
+            "description",
+            "dob",
+            "gender",
+            "ph_num",
+            "facebook",
+            "region",
+            "profile_pic",
+            "cover_pic",
+            "card_pic",
+            "created_at",
+            "updated_at"
+        ],
+        "USR":[
+            "email",
+            "uname",
+            "status",
+            "role",
+            "created_at",
+            "updated_at"
+
+        ]
+    }
+
     class Meta:
         verbose_name = 'staff'
         verbose_name_plural = 'staff members'
@@ -61,6 +91,15 @@ class Tag(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "created_at",
+            "updated_at",
+        ],
+    }
+
+    
     class Meta:
         verbose_name = 'tag'
         verbose_name_plural = 'tags'
@@ -71,11 +110,20 @@ class StaffDepartment(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     pos = models.IntegerField()
+    job = models.CharField(max_length=256,default="member")
     is_primary = models.BooleanField(default=False)
     is_leader = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "created_at",
+            "updated_at"
+        ]
+    }
 
     class Meta:
         verbose_name = "staffdepartment relation"
@@ -92,6 +140,14 @@ class StaffTag(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "created_at",
+            "updated_at"
+        ]
+    }
 
     class Meta:
         verbose_name = "stafftag relation"

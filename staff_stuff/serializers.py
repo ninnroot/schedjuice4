@@ -7,7 +7,7 @@ from work_stuff.serializers import StaffSessionSerializer
 
 from .models import Department, Staff, Tag, StaffTag, StaffDepartment
 from work_stuff.serializers import StaffWorkSerializer
-
+from role_stuff.serializers import RoleOnlySerializer
 
 
 # Only-serializers
@@ -137,8 +137,10 @@ class StaffTagSerializer(DynamicFieldsModelSerializer):
 class StaffSerializer(DynamicFieldsModelSerializer):
     departments = StaffDepartmentSerializer(source="staffdepartment_set", fields="id,pos,department_details", many=True,read_only=True)
     tags = StaffTagSerializer(source="stafftag_set",fields="id,pos,tag_details", many=True,read_only=True)
-    works = StaffWorkSerializer(source="staffwork_set",fields="id,work_details", many=True, read_only=True)
+    works = StaffWorkSerializer(source="staffwork_set",fields="id,work_details,role_details", many=True, read_only=True)
     sessions = StaffSessionSerializer(source="staffsession_set",fields="id,session_details", many=True, read_only=True)
+    role_details = RoleOnlySerializer(source="role",read_only=True)
+    
     _status_lst = [
             "in progress:0",
             "in progress:1",
@@ -167,11 +169,9 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
         return user
 
-        return user
-
     class Meta:
         model = Staff
-        fields= "__all__"
+        exclude = ["password"]
         dept = 1
 
 class DepartmentSerializer(DynamicFieldsModelSerializer):

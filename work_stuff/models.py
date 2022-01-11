@@ -2,6 +2,7 @@ from datetime import date, time
 from django.db import models
 from django.core.validators import RegexValidator
 from staff_stuff.models import Staff
+from role_stuff.models import Role
 # Create your models here.
 
 class Category(models.Model):
@@ -11,6 +12,15 @@ class Category(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "name",
+            "created_at",
+            "updated_at"
+        ]
+    }
 
     class Meta:
         verbose_name = "category"
@@ -37,6 +47,24 @@ class Work(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "created_at",
+            "updated_at"
+        ],
+        "USR":[
+            "name",
+            "valid_from",
+            "valid_to",
+            "status",
+            "predecessor",
+            "category",
+            "created_at",
+            "updated_at"
+        ]
+    }
+
     class Meta:
         verbose_name = "work"
         verbose_name_plural = "works"
@@ -53,6 +81,23 @@ class Session(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "created_at",
+            "updated_at"
+        ],
+        "USR":[
+            "work",
+            "day",
+            "time_from"
+            "time_to",
+            "created_at",
+            "updated_at"
+        ]
+    }
+
     class Meta:
         verbose_name = "session"
         verbose_name_plural = "sessions"
@@ -64,6 +109,7 @@ class StaffWork(models.Model):
 
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -78,6 +124,7 @@ class StaffSession(models.Model):
 
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

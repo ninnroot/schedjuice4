@@ -5,6 +5,9 @@ from .pagination import CustomPagination
 
 class GeneralList(APIView,CustomPagination):
     permission_classes = []
+    related_fields = []
+    read_only_fields = []
+    excluded_fields = []
     def get(self,request):
         return getlist_helper(self,request)
 
@@ -13,6 +16,9 @@ class GeneralList(APIView,CustomPagination):
 
 class GeneralDetails(APIView,CustomPagination):
     permission_classes = []
+    related_fields = []
+    read_only_fields = []
+    excluded_fields = []
     def get(self, request, obj_id):
         return getdetails_helper(self,request,obj_id)
 

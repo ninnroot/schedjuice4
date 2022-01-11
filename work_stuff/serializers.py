@@ -2,6 +2,7 @@ from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from rest_framework import serializers
 from .models import Work, StaffWork, Session, StaffSession, Category
 from staff_stuff.models import Staff
+from role_stuff.serializers import RoleOnlySerializer
              
 
 class CategoryOnlySerializer(DynamicFieldsModelSerializer):
@@ -30,10 +31,11 @@ class SessionSerializer(DynamicFieldsModelSerializer):
 class StaffSessionSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff", fields="id,email,dname,ename,uname,profile_pic,card_pic",read_only=True)
     session_details = SessionSerializer(source="session",fields="id,work,day,time_from,time_to", read_only=True)
+    role_details = RoleOnlySerializer(source="role_set", fields="id,name,shorthand,is_specific", read_only=True)
 
     def validate(self, data):
-        s = data["staff"]
-        se = data["session"]
+        s = data.get("staff")
+        se = data.get("session")
             
         
         obj = StaffWork.objects.filter(staff=s, work=se.work).first()
@@ -50,10 +52,11 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
 class StaffWorkSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,uname,profile_pic,card_pic", read_only=True)
     work_details = WorkOnlySerializer(source="work", fields="id,name", read_only=True)
+    role_details = RoleOnlySerializer(source="role", fields="id,name,shorthand,is_specific", read_only=True)
 
     def validate(self, data):
-        s = data["staff"]
-        w = data["work"]
+        s = data.get("staff")
+        w = data.get("work")
         obj = StaffWork.objects.filter(staff=s,work=w).first()
         if obj is not None:
             raise serializers.ValidationError("Instance already exists.")
@@ -71,7 +74,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
         fields = "__all__"
 
 class WorkSerializer(DynamicFieldsModelSerializer):
-    staff = StaffWorkSerializer(source="staffwork_set",fields="id,staff_details" , many=True, read_only=True)
+    staff = StaffWorkSerializer(source="staffwork_set",fields="id,staff_details,role_details" , many=True, read_only=True)
     sessions = SessionSerializer(source="session_set", many=True, read_only=True)
     category = CategoryOnlySerializer(read_only=True)
     _status_lst = [

@@ -1,32 +1,36 @@
+from rest_framework import request
 from schedjuice4.generic_views import GeneralDetails, GeneralList
 from rest_framework.permissions import IsAuthenticated
+
+from role_stuff.permissions import IsADMOrReadOnly, IsOwnerOrReadOnly
 from .models import Department, Staff, Tag, StaffTag, StaffDepartment
 from .serializers import (
                         DepartmentSerializer, StaffSerializer,
                         StaffTagSerializer, TagSerializer,
                         StaffDepartmentSerializer)
 
+from role_stuff.permissions import RegistrationPhase
+
 # Create your views here.
 
 
-
-
-
-
 class StaffList(GeneralList):
+    authentication_classes = []
     model = Staff
     serializer = StaffSerializer
     related_fields = [
         "staffwork_set","staffsession_set",
         "stafftag_set","staffdepartment_set",
-        "user_permissions","groups"
+        "user_permissions","groups", "role"
     ]
+    
+    permission_classes = [RegistrationPhase]
     
 
 class StaffDetails(GeneralDetails):
     model = Staff
     serializer = StaffSerializer
-
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 
 class DepartmentList(GeneralList):
@@ -35,7 +39,7 @@ class DepartmentList(GeneralList):
     related_fields = [
         "staffdepartment_set"
     ]
-    permission_classes = []
+    
 
 
 class DepartmentDetails(GeneralDetails):

@@ -6,27 +6,41 @@ from .filter import get_filter_query
 
 
 
-
 def getlist_helper(self,request:Request):
-    
     if not hasattr(self,"related_fields"):
         self.related_fields = []
     query = get_filter_query(self.model,request,pre=self.related_fields)
     page = self.paginate_queryset(query,request)
     
-    seri = self.serializer(page,many=True,fields=request.query_params.get("fields"))
+    seri = self.serializer(
+        page,many=True,
+        fields=request.query_params.get("fields"),
+        read_only_fields=self.read_only_fields,
+        excluded_fields=self.excluded_fields
+        )
     
 
     return self.get_paginated_response(seri.data, status=status.HTTP_200_OK)
 
 def getdetails_helper(self,request:Request,obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
-    seri = self.serializer(obj,fields=request.query_params.get("fields"))
+    self.check_object_permissions(self.request,obj)
+    
+    seri = self.serializer(
+        obj,
+        fields=request.query_params.get("fields"),
+        read_only_fields=self.read_only_fields,
+        excluded_fields=self.excluded_fields
+        )
     
     return Response(seri.data, status=status.HTTP_200_OK)
 
 def post_helper(self, request:Request):
-        seri = self.serializer(data=request.data)
+        seri = self.serializer(
+            data=request.data,
+            read_only_fields=self.read_only_fields,
+            excluded_fields=self.excluded_fields
+        )
         if seri.is_valid():
 
             seri.save()
@@ -35,7 +49,15 @@ def post_helper(self, request:Request):
 
 def put_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
-    seri = self.serializer(obj,data=request.data,partial=True)
+    
+    self.check_object_permissions(self.request,obj)
+   
+    seri = self.serializer(
+        obj,
+        data=request.data,partial=True,
+        read_only_fields=self.read_only_fields,
+        excluded_fields=self.excluded_fields
+        )
     
     if seri.is_valid():
         seri.save()
