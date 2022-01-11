@@ -1,5 +1,3 @@
-from os import path
-import re
 from django.core.exceptions import NON_FIELD_ERRORS
 from rest_framework.exceptions import bad_request
 from rest_framework.permissions import BasePermission
@@ -20,7 +18,7 @@ def readonly_determiner(self, request, view, role):
     rf = set(view.model.read_only_fields[role]).intersection(set(request.data.keys()))
     if len(rf)!=0:
         self.message = f"You do not have permission to update these fields: {rf}"
-        if "status" in rf:
+        if "status" in rf or "role" in rf:
             self.message = "You think you are so clever, huh?"
         return False
     return True
@@ -60,6 +58,19 @@ class StatusCheck(BasePermission):
                 return False
 
         return False
+    def has_object_permission(self, request, view, obj):
+        return True
+
+class IsSDM(BasePermission):
+    message = "You have to be SDM to perform this action"
+    def has_permission(self, request, view):
+        user = Staff.objects.get(pk=request.user.id)
+        if user.role:
+            if user.role.shorthand == "SDM":
+                return True
+        return False
+    def has_object_permission(self, request, view, obj):
+        return True
 
 
 class IsSDMOrReadOnly(BasePermission):
