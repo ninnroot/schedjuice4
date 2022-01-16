@@ -1,9 +1,7 @@
-from django.core.exceptions import NON_FIELD_ERRORS
-from rest_framework.exceptions import bad_request
 from rest_framework.permissions import BasePermission
 from staff_stuff.models import Staff
 from work_stuff.models import StaffWork, StaffSession
-
+from django.conf import settings
 
 def get_role_helper(request):
     user = request.user
@@ -53,6 +51,8 @@ class StatusCheck(BasePermission):
     message = "Status check failed."
 
     def has_permission(self, request, view):
+        if settings.SET_PERMISSION == True:
+            return True
         
         user = Staff.objects.get(pk=request.user.id)
 
@@ -84,6 +84,8 @@ class IsSDM(BasePermission):
     message = "You have to be SDM to perform this action"
 
     def has_permission(self, request, view):
+        if settings.SET_PERMISSION == True:
+            return True
 
         user = Staff.objects.get(pk=request.user.id)
 
@@ -102,7 +104,10 @@ class IsSDM(BasePermission):
 class IsSDMOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. SDM  role is required."
     
-    def has_permission(self, request, view):        
+    def has_permission(self, request, view):
+        if settings.SET_PERMISSION == True:
+            return True
+
         user = Staff.objects.get(pk=request.user.id)
 
         if user.role is not None:
@@ -119,6 +124,9 @@ class IsADMOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. At least the ADM role is required."
 
     def has_permission(self, request, view):
+        if settings.SET_PERMISSION == True:
+            return True
+
         role = get_role_helper(request)
 
         if role is None:
@@ -144,6 +152,9 @@ class IsOwnerOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. You are not the owner."
 
     def has_permission(self, request, view):
+        if settings.SET_PERMISSION == True:
+            return True
+
         role = get_role_helper(request)
 
         if role is None:
@@ -171,6 +182,8 @@ class IsOwnerOrReadOnly(BasePermission):
 
 
     def has_object_permission(self, request, view, obj):
+        if settings.SET_PERMISSION == True:
+            return True
         role = get_role_helper(request)
 
         dic = {
@@ -189,7 +202,14 @@ class IsOwnerOrReadOnly(BasePermission):
 class RegistrationPhase(BasePermission):
     
     def has_permission(self, request, view):
+
+        if settings.SET_PERMISSION == True:
+            return True
+
         if request.method == "GET":
+            if str(request.user) == "AnonymousUser":
+                self.message = "You are not authenticated"
+                return False
             return True
         banned_lst = [
             "status",

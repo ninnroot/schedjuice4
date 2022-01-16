@@ -31,6 +31,7 @@ DEBUG = config("DEBUG",default=False,cast=bool)
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "api.teachersucenter.com",
+    "localhost",
     config("DBHOST")
 ]
 
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     "work_stuff",
     "role_stuff",
     "wiki",
+    "ms_stuff",
 
     # add this at last
     "django_cleanup.apps.CleanupConfig"
@@ -193,7 +195,7 @@ INTERNAL_IPS = [
 
 # JWT stuffs
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=2),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=4),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
@@ -216,3 +218,8 @@ CORS_ALLOWED_ORIGINS=[
     "http://18.140.5.9",
     "https://18.140.5.9",
 ]
+
+
+# Custom settings
+
+SET_PERMISSION = True

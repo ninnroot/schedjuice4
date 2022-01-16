@@ -8,6 +8,7 @@ class GeneralList(APIView,CustomPagination):
     related_fields = []
     read_only_fields = []
     excluded_fields = []
+
     def get(self,request):
         return getlist_helper(self,request)
 
@@ -19,6 +20,7 @@ class GeneralDetails(APIView,CustomPagination):
     related_fields = []
     read_only_fields = []
     excluded_fields = []
+
     def get(self, request, obj_id):
         return getdetails_helper(self,request,obj_id)
 

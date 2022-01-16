@@ -22,7 +22,7 @@ class StaffList(GeneralList):
         "stafftag_set","staffdepartment_set",
         "user_permissions","groups", "role"
     ]
-    
+
     permission_classes = [RegistrationPhase]
     
 

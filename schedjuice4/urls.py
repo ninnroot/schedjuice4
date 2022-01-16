@@ -18,17 +18,22 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 import debug_toolbar
-from rest_framework_simplejwt.views import TokenObtainPairView
-
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/v1/obtain",TokenObtainPairView.as_view()),
     path("api/v1/", include("reminder.urls")),
     path("api/v1/", include("staff_stuff.urls")),
     path("api/v1/", include("work_stuff.urls")),
     path("api/v1/", include("role_stuff.urls")),
+    path("api/v1/", include("ms_stuff.urls")),
     path("api/v1/", include("wiki.urls")),
-    path('__debug__/', include(debug_toolbar.urls)),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
+
+if settings.DEBUG:
+    try:
+        import debug_toolbar
+        urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns
+    except ImportError:
+        pass

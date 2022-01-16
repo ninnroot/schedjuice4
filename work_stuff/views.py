@@ -14,8 +14,8 @@ class CategoryList(GeneralList):
 class CategoryDetails(GeneralDetails):
     model = Category
     serializer = CategorySerializer
-    related_fields = ["work_set"]
     permission_classes = [IsAuthenticated,StatusCheck, IsSDMOrReadOnly]
+
 
 
 class WorkList(GeneralList):
