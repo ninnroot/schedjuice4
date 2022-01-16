@@ -1,4 +1,5 @@
 
+from webbrowser import get
 from django.contrib.auth.hashers import make_password
 
 from rest_framework import serializers
@@ -9,6 +10,8 @@ from .models import Department, Staff, Tag, StaffTag, StaffDepartment
 from work_stuff.serializers import StaffWorkSerializer
 from role_stuff.serializers import RoleOnlySerializer
 
+from ms_stuff.graph_helper import UserMS
+from ms_stuff.auth import get_token
 
 # Only-serializers
 
@@ -157,6 +160,22 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         ]
 
     def validate(self, data):
+        request = self.context.get("request")
+        usr = UserMS(get_token(request))
+        # create MS User
+        res = usr.post(request)
+        if res.status_code not in range(199,300):
+            raise(serializers.ValidationError({"MS_error":res.json(),"step":1}))
+
+        # Update MS user for its mail and usage location
+        res = usr.patch(request,request.POST.get("email"))
+        if res.status_code not in range(199,300):
+            raise(serializers.ValidationError({"MS_error":res.json(), "step":2}))
+
+        res = usr.assign_license(request.POST.get("email"),"staff")
+        if res.status_code not in range(199,300):
+            raise(serializers.ValidationError({"MS_error":res.json(), "step":3}))
+
         status = data.get("status")
         if not status_check(status, self._status_lst):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
@@ -182,6 +201,9 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         instance.save()
 
         return instance
+
+
+
     class Meta:
         model = Staff
         fields = "__all__"

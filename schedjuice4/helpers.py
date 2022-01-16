@@ -4,7 +4,8 @@ from rest_framework import status
 from rest_framework.request import Request
 from .filter import get_filter_query
 
-
+from ms_stuff.auth import get_token
+from ms_stuff.graph_helper import UserMS
 
 def getlist_helper(self,request:Request):
     if not hasattr(self,"related_fields"):
@@ -16,10 +17,11 @@ def getlist_helper(self,request:Request):
         page,many=True,
         fields=request.query_params.get("fields"),
         read_only_fields=self.read_only_fields,
-        excluded_fields=self.excluded_fields
+        excluded_fields=self.excluded_fields,
+        context={"request":request}
         )
     
-
+    
     return self.get_paginated_response(seri.data, status=status.HTTP_200_OK)
 
 def getdetails_helper(self,request:Request,obj_id):
@@ -30,7 +32,8 @@ def getdetails_helper(self,request:Request,obj_id):
         obj,
         fields=request.query_params.get("fields"),
         read_only_fields=self.read_only_fields,
-        excluded_fields=self.excluded_fields
+        excluded_fields=self.excluded_fields,
+        context={"request":request}
         )
     
     return Response(seri.data, status=status.HTTP_200_OK)
@@ -39,7 +42,8 @@ def post_helper(self, request:Request):
         seri = self.serializer(
             data=request.data,
             read_only_fields=self.read_only_fields,
-            excluded_fields=self.excluded_fields
+            excluded_fields=self.excluded_fields ,
+            context={"request":request}
         )
         if seri.is_valid():
 
@@ -51,12 +55,13 @@ def put_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
     
     self.check_object_permissions(self.request,obj)
-   
+    
     seri = self.serializer(
         obj,
         data=request.data,partial=True,
         read_only_fields=self.read_only_fields,
-        excluded_fields=self.excluded_fields
+        excluded_fields=self.excluded_fields,
+        context={"request":request}
         )
     
     if seri.is_valid():
@@ -68,7 +73,7 @@ def put_helper(self,request:Request, obj_id):
 
 def delete_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
-    seri = self.serializer(obj).data
+    seri = self.serializer(obj,context={"request":request}).data
     obj.delete()
 
     return Response(seri, status=status.HTTP_200_OK)

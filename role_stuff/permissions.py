@@ -51,7 +51,7 @@ class StatusCheck(BasePermission):
     message = "Status check failed."
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION == True:
+        if settings.SET_PERMISSION:
             return True
         
         user = Staff.objects.get(pk=request.user.id)
@@ -84,7 +84,7 @@ class IsSDM(BasePermission):
     message = "You have to be SDM to perform this action"
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION == True:
+        if settings.SET_PERMISSION:
             return True
 
         user = Staff.objects.get(pk=request.user.id)
@@ -105,7 +105,7 @@ class IsSDMOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. SDM  role is required."
     
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION == True:
+        if settings.SET_PERMISSION:
             return True
 
         user = Staff.objects.get(pk=request.user.id)
@@ -124,7 +124,7 @@ class IsADMOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. At least the ADM role is required."
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION == True:
+        if settings.SET_PERMISSION:
             return True
 
         role = get_role_helper(request)
@@ -152,7 +152,7 @@ class IsOwnerOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. You are not the owner."
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION == True:
+        if settings.SET_PERMISSION:
             return True
 
         role = get_role_helper(request)
@@ -182,7 +182,7 @@ class IsOwnerOrReadOnly(BasePermission):
 
 
     def has_object_permission(self, request, view, obj):
-        if settings.SET_PERMISSION == True:
+        if settings.SET_PERMISSION:
             return True
         role = get_role_helper(request)
 
@@ -203,7 +203,7 @@ class RegistrationPhase(BasePermission):
     
     def has_permission(self, request, view):
 
-        if settings.SET_PERMISSION == True:
+        if settings.SET_PERMISSION:
             return True
 
         if request.method == "GET":

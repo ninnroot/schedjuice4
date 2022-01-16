@@ -27,9 +27,10 @@ class StaffList(GeneralList):
     
 
 class StaffDetails(GeneralDetails):
+    authentication_classes = []
     model = Staff
     serializer = StaffSerializer
-    permission_classes = [IsAuthenticated, StatusCheck,IsOwnerOrReadOnly]
+    #permission_classes = [IsAuthenticated, StatusCheck,IsOwnerOrReadOnly]
 
 
 class DepartmentList(GeneralList):

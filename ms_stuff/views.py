@@ -1,18 +1,15 @@
-from http.client import ImproperConnectionState
-from os import stat
-from urllib import request
+
 from django.http import HttpResponseRedirect
 from rest_framework.views import APIView, Response, status
 import msal
 from staff_stuff.models import Staff
 from rest_framework_simplejwt.tokens import RefreshToken
-import requests
 from dateutil import tz, parser
 from .auth import (
     get_sign_in_flow, get_token_from_code,
     store_user, remove_user_and_token, get_token
     )
-from .graph_helper import get_user
+from .graph_helper import UserMS, get_user
 
 
 def callback(request):
@@ -36,7 +33,7 @@ class Redirected(APIView):
     def get(self, request):
         result = get_token_from_code(request)
         try:
-            user = get_user(result["access_token"])
+            user = get_user(result["access_token"],me=True)
             store_user(request, user)
             staff = Staff.objects.get(email=user["userPrincipalName"])
             if staff:
@@ -44,13 +41,24 @@ class Redirected(APIView):
                 return Response({"access":str(access)}, status=status.HTTP_200_OK)
             
             return Response({"message":"No such Microsoft account."}, status=status.HTTP_404_NOT_FOUND)
-        except KeyError:
+        except KeyError as e:
             
         
-            return Response(result)
+            return Response({"error":str(e)})
 
 
 class SignOut(APIView):
-    def get():
+    def get(self, request):
         remove_user_and_token(request)
-        return Response({"message":"ok"})
+        return Response({"message":"Successfully signed out."})
+
+
+class Test(APIView):
+
+    def get(self, request):
+        res = UserMS(get_token(request)).get_licenses()
+        return Response(res.json())
+
+    def post(self, request):
+        res = UserMS(get_token(request)).post(request)
+        return Response(res)

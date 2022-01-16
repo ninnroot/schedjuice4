@@ -84,6 +84,10 @@ class Staff(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'staff members'
         ordering = ["id"]
 
+    def delete(self, *args, **kwargs):
+        print("hello")
+        print(self.email)
+        return super().delete(*args, **kwargs)
 
 
 class Tag(models.Model):

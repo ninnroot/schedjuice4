@@ -1,17 +1,15 @@
+from tkinter.messagebox import NO
 import msal
 import os
 import json
 from decouple import config
-
+from .config import settings
 
 """
 These are basically copied from here: https://docs.microsoft.com/en-us/graph/tutorials/python?tutorial-step=3
 With some slight modifications.
 """
 
-p = os.path.join(os.getcwd(),"ms_stuff", "config.json")
-
-settings = json.loads(open(str(p),"r").read())
 
 def load_cache(request):
     cache = msal.SerializableTokenCache()
@@ -49,7 +47,6 @@ def get_token_from_code(request):
     auth_app = get_msal_app(cache)
 
     flow = request.session.pop("auth_flow", {})
-    print(request.GET)
     result =  auth_app.acquire_token_by_auth_code_flow(flow, request.GET)
     save_cache(request, cache)
 
@@ -58,14 +55,18 @@ def get_token_from_code(request):
 
 def store_user(request, user):
     try:
+        if "mailboxSettings" in user:
+            t = user["mailboxSettings"]["timeZone"]
+        else:
+            t = "UTC"
         request.session['MSuser'] = {
       'is_authenticated': True,
       'name': user['displayName'],
       'email': user['mail'] if (user['mail'] != None) else user['userPrincipalName'],
-      'timeZone': user['mailboxSettings']['timeZone'] if (user['mailboxSettings']['timeZone'] != None) else 'UTC'
+      'timeZone': t
     },
     except Exception as e:
-        print(e)
+        print("ERROR",e)
 
 
 def get_token(request):
@@ -73,13 +74,14 @@ def get_token(request):
     auth_app = get_msal_app(cache)
     
     accounts = auth_app.get_accounts()
+    
     if accounts:
         result = auth_app.acquire_token_silent(
             settings["scopes"],
             account = accounts[0]
         )
-    save_cache(request, cache)
-    return result["access_token"]
+        save_cache(request, cache)
+        return result["access_token"]
 
 
 def remove_user_and_token(request):
