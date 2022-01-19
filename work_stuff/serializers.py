@@ -4,6 +4,9 @@ from .models import Work, StaffWork, Session, StaffSession, Category
 from staff_stuff.models import Staff
 from role_stuff.serializers import RoleOnlySerializer
              
+from ms_stuff.graph_helper import GroupMS
+from ms_stuff.auth import get_token
+
 
 class CategoryOnlySerializer(DynamicFieldsModelSerializer):
     
@@ -91,9 +94,22 @@ class WorkSerializer(DynamicFieldsModelSerializer):
         status = data.get("status")
         if not status_check(status, self._status_lst):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
-            
+        
+        r = self.context.get("request")
+        work = GroupMS(get_token(r),"educationClass")
+        res = work.post(r)
+        
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json()})
+        print(res.content)
+        print(res)
+        return super().validate(data) 
+
     class Meta:
         model = Work
         fields = "__all__"
+        extra_kwargs = {
+            "ms_id":{"required":False}
+        }
 
 

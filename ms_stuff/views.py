@@ -35,7 +35,7 @@ class Redirected(APIView):
         try:
             user = get_user(result["access_token"],me=True)
             store_user(request, user)
-            staff = Staff.objects.get(email=user["userPrincipalName"])
+            staff = Staff.objects.filter(email=user["userPrincipalName"]).first()
             if staff:
                 access = RefreshToken.for_user(staff).access_token
                 return Response({"access":str(access)}, status=status.HTTP_200_OK)

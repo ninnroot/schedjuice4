@@ -1,11 +1,17 @@
 from datetime import date, time
 from django.db import models
 from django.core.validators import RegexValidator
+
 from staff_stuff.models import Staff
 from role_stuff.models import Role
-# Create your models here.
 
-class Category(models.Model):
+from ms_stuff.graph_helper import GroupMS
+from ms_stuff.auth import get_token
+
+from schedjuice4.models import CustomModel
+from ms_stuff.exceptions import MSException
+
+class Category(CustomModel):
 
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField()
@@ -29,9 +35,10 @@ class Category(models.Model):
 
 
 
-class Work(models.Model):
+class Work(CustomModel):
 
     name = models.CharField(max_length=256,unique=True)
+    ms_id = models.CharField(max_length=256, unique=True)
     description = models.TextField(default="Description...")
     meeting_id = models.CharField(max_length=20,default="not provided",validators=[RegexValidator(r'^\d{1,11}$ ')])
     viber_group = models.CharField(max_length=256,default="https://")
@@ -65,13 +72,31 @@ class Work(models.Model):
         ]
     }
 
+    def save(self, *args, **kwargs):
+        return super().save(*args, **kwargs)
+
+    
+    def delete(self, *args, **kwargs):
+        
+        # deleting MS team
+        r = kwargs.pop("r")
+        res = GroupMS(get_token(r)).delete(self.ms_id)
+        silent = kwargs.pop("silent")
+
+        if res.status_code not in range(199,300):
+            if res.status_code == 404 and not silent:
+                raise(MSException(detail=res.json()))
+
+        return super().delete(*args, **kwargs)
+
+
     class Meta:
         verbose_name = "work"
         verbose_name_plural = "works"
         ordering = ["-id"]
 
 
-class Session(models.Model):
+class Session(CustomModel):
 
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     day = models.CharField(max_length=1)
@@ -105,7 +130,7 @@ class Session(models.Model):
 
 
 
-class StaffWork(models.Model):
+class StaffWork(CustomModel):
 
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
@@ -119,8 +144,13 @@ class StaffWork(models.Model):
         verbose_name_plural = "staffwork relations"
         ordering = ["-id"]
 
+    def save(self, *args, **kwargs):
 
-class StaffSession(models.Model):
+
+
+        return super().save(*args, **kwargs)
+
+class StaffSession(CustomModel):
 
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)

@@ -1,11 +1,13 @@
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
+
 from rest_framework.request import Request
 from .filter import get_filter_query
 
-from ms_stuff.auth import get_token
-from ms_stuff.graph_helper import UserMS
+from ms_stuff.exceptions import MSException
+
+
 
 def getlist_helper(self,request:Request):
     if not hasattr(self,"related_fields"):
@@ -24,6 +26,7 @@ def getlist_helper(self,request:Request):
     
     return self.get_paginated_response(seri.data, status=status.HTTP_200_OK)
 
+
 def getdetails_helper(self,request:Request,obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
     self.check_object_permissions(self.request,obj)
@@ -38,6 +41,7 @@ def getdetails_helper(self,request:Request,obj_id):
     
     return Response(seri.data, status=status.HTTP_200_OK)
 
+
 def post_helper(self, request:Request):
         seri = self.serializer(
             data=request.data,
@@ -50,6 +54,7 @@ def post_helper(self, request:Request):
             seri.save()
             return Response(seri.data, status=status.HTTP_201_CREATED)
         return Response(seri.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 def put_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
@@ -74,8 +79,13 @@ def put_helper(self,request:Request, obj_id):
 def delete_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
     seri = self.serializer(obj,context={"request":request}).data
-    obj.delete()
+    try:
+        obj.delete(r=request,silent=request.query_params.get("silent"))
+        return Response(seri, status=status.HTTP_200_OK)
+    
+    except MSException as e:
+        return Response(e.detail, status=status.HTTP_404_NOT_FOUND)
 
-    return Response(seri, status=status.HTTP_200_OK)
+    
 
 

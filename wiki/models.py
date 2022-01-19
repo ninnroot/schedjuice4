@@ -1,7 +1,10 @@
 from django.db import models
 from django.db.models.deletion import CASCADE
 
-class TopicTag(models.Model):
+from schedjuice4.models import CustomModel
+
+
+class TopicTag(CustomModel):
 
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField()
@@ -15,7 +18,9 @@ class TopicTag(models.Model):
         verbose_name_plural = 'topic_tags'
         ordering = ["id"]
 
-class Topic(models.Model):
+
+
+class Topic(CustomModel):
 
     title = models.JSONField()
     content = models.JSONField()
@@ -33,7 +38,7 @@ class Topic(models.Model):
         verbose_name_plural = "topics"
         ordering = ["id"]
 
-class TopicTagRelation(models.Model):
+class TopicTagRelation(CustomModel):
 
     topic = models.ForeignKey(Topic, on_delete=CASCADE)
     tag = models.ForeignKey(TopicTag,on_delete=CASCADE)

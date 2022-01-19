@@ -3,7 +3,8 @@ settings = {
     "authority":"https://login.microsoftonline.com/trsuedu.onmicrosoft.com",
     "scopes":[
         "User.ReadWrite.All",
-        "Directory.Read.All"
+        "Directory.ReadWrite.All",
+        "Group.ReadWrite.All"
     ],
     "redirect":"http://localhost:8000/api/v1/tokenurl"
 }

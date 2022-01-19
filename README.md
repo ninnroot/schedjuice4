@@ -105,10 +105,26 @@ see [here](https://django-debug-toolbar.readthedocs.io/en/latest/installation.ht
 
 ## Django DRF permissions
 yea, permissions
+
 see [here](https://testdriven.io/blog/custom-permission-classes-drf/)
 
 ## Authentication with Microsoft
 MS 365 migrations, yay!
+
 see [here](https://docs.microsoft.com/en-us/graph/tutorials/python)
 
+## MS Graph API docs
+the docs are very helpful. 
+
+see [here](https://docs.microsoft.com/en-us/graph/)
+
+## For creating custom Exception classes
+this is pretty easy. But, just for referencing matters.
+
+see [here](https://www.django-rest-framework.org/api-guide/exceptions/#exceptions)
+
+## Overriding predefined methods in Django models
+another layer of encapsulation. I am falling in love with OOP.
+
+see [here](https://docs.djangoproject.com/en/4.0/topics/db/models/#overriding-predefined-model-methods)
 

@@ -160,8 +160,10 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         ]
 
     def validate(self, data):
+
         request = self.context.get("request")
         usr = UserMS(get_token(request))
+        
         # create MS User
         res = usr.post(request)
         if res.status_code not in range(199,300):
@@ -172,6 +174,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         if res.status_code not in range(199,300):
             raise(serializers.ValidationError({"MS_error":res.json(), "step":2}))
 
+        # assign license and email address
         res = usr.assign_license(request.POST.get("email"),"staff")
         if res.status_code not in range(199,300):
             raise(serializers.ValidationError({"MS_error":res.json(), "step":3}))

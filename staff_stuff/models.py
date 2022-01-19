@@ -1,12 +1,20 @@
 from django.db import models
 from datetime import date, time
+
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.validators import RegexValidator
 from .managers import UserManager
+
 from role_stuff.models import Role
 
-class Department(models.Model):
+from ms_stuff.graph_helper import UserMS
+from ms_stuff.auth import get_token
+from ms_stuff.exceptions import MSException
+
+from schedjuice4.models import CustomModel
+
+class Department(CustomModel):
 
     name = models.CharField(max_length=256, unique=True)
     shorthand = models.CharField(unique=True,max_length=6)
@@ -84,13 +92,23 @@ class Staff(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'staff members'
         ordering = ["id"]
 
+
     def delete(self, *args, **kwargs):
-        print("hello")
-        print(self.email)
+        
+        # deleting MS account
+        r = kwargs.pop("r")
+        res = UserMS(get_token(r)).delete(self.email)
+        silent = kwargs.pop("silent")
+        loud = not silent
+
+        if res.status_code not in range(199,300):
+            if res.status_code == 404 and loud:
+                raise MSException(detail=res.json())
+
         return super().delete(*args, **kwargs)
 
 
-class Tag(models.Model):
+class Tag(CustomModel):
 
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField(default="Description...")
@@ -115,7 +133,7 @@ class Tag(models.Model):
 
 
 
-class StaffDepartment(models.Model):
+class StaffDepartment(CustomModel):
     
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
@@ -143,7 +161,7 @@ class StaffDepartment(models.Model):
 
 
 
-class StaffTag(models.Model):
+class StaffTag(CustomModel):
 
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
