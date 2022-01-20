@@ -128,3 +128,12 @@ another layer of encapsulation. I am falling in love with OOP.
 
 see [here](https://docs.djangoproject.com/en/4.0/topics/db/models/#overriding-predefined-model-methods)
 
+## Jinja2
+to send emails in MIME format, I decided to add Jinja2 functionality and stuffs.
+
+see [here](https://zetcode.com/python/jinja/) and [here](https://jinja.palletsprojects.com/en/3.0.x/api/#jinja2.Template)
+
+## MIME 
+how MIME works while sending emails.
+
+see [here](https://realpython.com/python-send-email/)

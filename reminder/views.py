@@ -1,9 +1,7 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from django.http import Http404
-from django.core.mail import send_mail
+
 from .tasks import send_mail_task
 from decouple import config
 from celery.result import AsyncResult

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "role_stuff",
     "wiki",
     "ms_stuff",
+    "jinja2_stuff",
 
     # add this at last
     "django_cleanup.apps.CleanupConfig"

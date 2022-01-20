@@ -4,7 +4,12 @@ settings = {
     "scopes":[
         "User.ReadWrite.All",
         "Directory.ReadWrite.All",
-        "Group.ReadWrite.All"
+        "Group.ReadWrite.All",
+        "Mail.ReadWrite",
+        "Mail.Send",
+        "MailboxSettings.ReadWrite"
     ],
-    "redirect":"http://localhost:8000/api/v1/tokenurl"
+    "redirect":"http://localhost:8000/api/v1/tokenurl",
+    "private_key_file":"server.pem",
+    "thumbprint":"355D69AC34FA421F1C3FC275362B67A6138C753B"
 }

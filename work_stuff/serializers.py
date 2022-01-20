@@ -101,8 +101,12 @@ class WorkSerializer(DynamicFieldsModelSerializer):
         
         if res.status_code not in range(199,300):
             raise serializers.ValidationError({"MS_error":res.json()})
-        print(res.content)
-        print(res)
+        
+        # get the group id from Graph API which is in the headers.
+        # save that together with the crated Work.
+        gp_id = res.headers["Content-Location"].split("'")[1::2][0]
+        data["ms_id"] = gp_id
+
         return super().validate(data) 
 
     class Meta:

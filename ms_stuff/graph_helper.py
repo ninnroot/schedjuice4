@@ -1,8 +1,21 @@
+from email import message
+import imp
 import requests
 import json
 
 from rest_framework.serializers import ValidationError
 from django.utils import timezone
+
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+from jinja2_stuff.core import env
+import base64
+
+from .auth import get_msal_app
+from .config import settings
+
+
 
 URL = "https://graph.microsoft.com/v1.0/"
 BETA_URL = "https://graph.microsoft.com/beta/"
@@ -10,6 +23,11 @@ BETA_URL = "https://graph.microsoft.com/beta/"
 LICENSES = {
     "staff":"94763226-9b3c-4e75-a931-5c89701abe66",
     "student":"314c4481-f395-4525-be8b-2ec4bb1e9d91"
+}
+
+MAIL_GROUPS = {
+    "allstaff":"5027018e-717d-4726-95ec-8d5b8ab51d1f",
+    "allstudents":"3b6a0875-5a4c-4a0a-8a75-8c150c57b8b3"
 }
 
 def get_user(token, name="", me=False):
@@ -99,7 +117,6 @@ class UserMS(MSRequest):
             headers=self.build_header())
 
 
-
 class GroupMS(MSRequest):
     """
     The class for making requests to the graph API for creating groups and teams.
@@ -161,3 +178,57 @@ class GroupMS(MSRequest):
 
     def delete(self, group:str):
         return requests.delete(URL+"groups/"+group, headers=self.build_header())
+
+
+class MailMS(MSRequest):
+
+    def __init__(self):
+        x = get_msal_app(daemon=True)
+        res = x.acquire_token_silent(settings["scopes"],account=None)
+        if not res:
+            res = x.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+
+        self.token = res["access_token"]
+        super().__init__(self.token)
+
+    def build_header(self):
+        return {
+            "Authorization":"Bearer "+self.token,
+            "Content-Type":"text/plain"
+        }
+
+
+    def make_template(self, template:str, context):
+        t = env.get_template(template)
+        
+        return t.render(context=context)
+
+
+    def send_welcome(self, sender:str, receiver:str, context, subj="Welcome to Teacher Su center"):
+        
+        message = MIMEMultipart("alternative")
+        message["subject"] = subj
+        message["From"] = sender
+        message["To"] = receiver
+        
+        body = MIMEText(self.make_template("welcome.html",context), "html")
+
+        message.attach(body)
+
+        message = base64.encodebytes(message.as_bytes())
+
+        return requests.post(
+            f"{URL}users/{sender}/sendMail",
+            message,
+            headers=self.build_header()
+            )
+
+
+
+
+        
+
+
+
+
+

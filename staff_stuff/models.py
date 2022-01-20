@@ -1,3 +1,4 @@
+from statistics import mode
 from django.db import models
 from datetime import date, time
 
@@ -34,6 +35,7 @@ class Department(CustomModel):
 class Staff(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(unique=True)
+    ms_id = models.CharField(max_length=256, unique=True)
     dname = models.CharField(max_length=128, default="Display Name")
     ename = models.CharField(max_length=128, default="Nickname")
     uname = models.SlugField(max_length=128, unique=True, validators=[RegexValidator(r"^[a-zA-Z0-9_]*$")])
@@ -96,16 +98,20 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     def delete(self, *args, **kwargs):
         
         # deleting MS account
-        r = kwargs.pop("r")
-        res = UserMS(get_token(r)).delete(self.email)
-        silent = kwargs.pop("silent")
-        loud = not silent
+        try:
+            r = kwargs.pop("r")
+            res = UserMS(get_token(r)).delete(self.email)
+            silent = kwargs.pop("silent")
+            loud = not silent
 
-        if res.status_code not in range(199,300):
-            if res.status_code == 404 and loud:
+            if res.status_code not in range(199,300):
+                if res.status_code == 404 and loud:
+                    return super().delete(*args, **kwargs)
+
                 raise MSException(detail=res.json())
 
-        return super().delete(*args, **kwargs)
+        except KeyError:
+            pass
 
 
 class Tag(CustomModel):

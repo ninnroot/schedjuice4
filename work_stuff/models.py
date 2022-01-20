@@ -79,16 +79,20 @@ class Work(CustomModel):
     def delete(self, *args, **kwargs):
         
         # deleting MS team
-        r = kwargs.pop("r")
-        res = GroupMS(get_token(r)).delete(self.ms_id)
-        silent = kwargs.pop("silent")
+        try:
+            r = kwargs.pop("r")
+            res = GroupMS(get_token(r)).delete(self.ms_id)
+            silent = kwargs.pop("silent")
 
-        if res.status_code not in range(199,300):
-            if res.status_code == 404 and not silent:
+            
+            if res.status_code not in range(199,300):
+                if silent and res.status_code == 404:
+                    return super().delete(*args, **kwargs)
+                
                 raise(MSException(detail=res.json()))
 
-        return super().delete(*args, **kwargs)
-
+        except KeyError:
+            pass
 
     class Meta:
         verbose_name = "work"

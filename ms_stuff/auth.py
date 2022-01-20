@@ -24,7 +24,21 @@ def save_cache(request, cache):
         request.session["token_cache"] = cache.serialize()
 
 
-def get_msal_app(cache=None):
+def get_msal_app(cache=None,daemon=False):
+
+    if daemon:
+        app = msal.ConfidentialClientApplication(
+            settings["app_id"],
+            authority=settings["authority"],
+            
+            client_credential={
+                "thumbprint": settings["thumbprint"],
+                "private_key": open(settings['private_key_file']).read()
+                },
+
+        )
+        return app
+    
     auth_app = msal.ClientApplication(
         settings["app_id"],
         authority=settings["authority"],
