@@ -5,6 +5,7 @@ from django.conf import settings
 
 def get_role_helper(request):
     user = request.user
+    
     if user:
         user = Staff.objects.get(pk=user.id)
         if user.role is not None:
@@ -51,29 +52,27 @@ class StatusCheck(BasePermission):
     message = "Status check failed."
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION:
+        if not settings.SET_PERMISSION:
             return True
         
         user = Staff.objects.get(pk=request.user.id)
 
-        if view.model.__name__ == "Staff":
 
-            if user.status == "active" or user.status == "on leave":
-                return True
+        if user.status == "active" or user.status == "on leave":
+            return True
 
-            if user.status == "unapproved":
-                self.message = "Please wait for your account's approval. We will notify via email once your account is activated."
-                return False
+        if user.status == "unapproved":
+            self.message = "Please wait for your account's approval. We will notify via email once your account is activated."
+            return False
 
-            elif user.status == "retired":
-                self.message = "Your account has been retired. If this might be an accident, please contact the admins."
-                return False
+        elif user.status == "retired":
+            self.message = "Your account has been retired. If this might be an accident, please contact the admins."
+            return False
 
-            else:
-                self.message = "Please finish your account registration"
-                return False
-
-        return False
+        else:
+            self.message = "Please finish your account registration"
+            return False
+ 
 
     def has_object_permission(self, request, view, obj):
         return True
@@ -84,7 +83,7 @@ class IsSDM(BasePermission):
     message = "You have to be SDM to perform this action"
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION:
+        if not settings.SET_PERMISSION:
             return True
 
         user = Staff.objects.get(pk=request.user.id)
@@ -105,7 +104,7 @@ class IsSDMOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. SDM  role is required."
     
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION:
+        if not settings.SET_PERMISSION:
             return True
 
         user = Staff.objects.get(pk=request.user.id)
@@ -124,7 +123,7 @@ class IsADMOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. At least the ADM role is required."
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION:
+        if not settings.SET_PERMISSION:
             return True
 
         role = get_role_helper(request)
@@ -152,7 +151,7 @@ class IsOwnerOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. You are not the owner."
 
     def has_permission(self, request, view):
-        if settings.SET_PERMISSION:
+        if not settings.SET_PERMISSION:
             return True
 
         role = get_role_helper(request)
@@ -182,7 +181,7 @@ class IsOwnerOrReadOnly(BasePermission):
 
 
     def has_object_permission(self, request, view, obj):
-        if settings.SET_PERMISSION:
+        if not settings.SET_PERMISSION:
             return True
         role = get_role_helper(request)
 
@@ -203,7 +202,7 @@ class RegistrationPhase(BasePermission):
     
     def has_permission(self, request, view):
 
-        if settings.SET_PERMISSION:
+        if not settings.SET_PERMISSION:
             return True
 
         if request.method == "GET":

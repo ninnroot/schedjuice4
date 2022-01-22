@@ -33,7 +33,13 @@ class Student(CustomModel):
     postal_code = models.CharField(max_length=12, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)    
+    updated_at = models.DateTimeField(auto_now=True)  
+
+    read_only_fields = {
+        "SDM":"",
+        "ADM":"email",
+            
+    }  
 
     class Meta:
         verbose_name = "student"

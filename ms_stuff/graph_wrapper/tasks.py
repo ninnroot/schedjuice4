@@ -13,7 +13,7 @@ def raise_error(request,step:str):
     return request
 
 def start_user_creation_flow(request, data, user_type:str, mail=True, pw=None):
-    user = UserMS(request.POST.get("email"))
+    user = UserMS(request.data.get("email"))
 
     if pw is None:
         pw = constants["DEFAULT_PASSWORD"]
@@ -36,11 +36,11 @@ def start_user_creation_flow(request, data, user_type:str, mail=True, pw=None):
     if mail:
         context = {"name": data["dname"], "email":data["email"], "password":pw}
         res = MailMS().send_welcome("staffy@teachersucenter.com",data["email"],context)
-        res = raise_error(res)
+        res = raise_error(res, "mail sending")
 
 
     if user_type == "staff":
         # add to security group
-        user.add_to_group(data["ms_id"],constants["SECURITY_GROUP"]["allstaff"],"members")
-
+        res = user.add_to_group(data["ms_id"],constants["SECURITY_GROUP"]["allstaff"],"members")
+        res = raise_error(res, "security group")
 

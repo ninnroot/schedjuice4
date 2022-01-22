@@ -22,7 +22,6 @@ def get_msal_app(cache=None):
             "thumbprint": settings["thumbprint"],
             "private_key": open(settings['private_key_file']).read()
             },
-        cache=cache
 
     )
     return app
@@ -65,11 +64,14 @@ class MSRequest:
             x = BETA_URL
         return requests.get(x+url, headers=self.headers)
 
-    def post(self, url, data, beta=False):
+    def post(self, url, data, beta=False, encode=True):
         x = URL
         if beta:
             x = BETA_URL
-        return requests.post(x+url, json.dumps(data), headers=self.headers)
+
+        if encode:
+            data=json.dumps(data)
+        return requests.post(x+url, data, headers=self.headers)
 
     def patch(self, url, data, beta=False):
         x = URL

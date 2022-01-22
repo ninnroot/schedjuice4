@@ -42,7 +42,7 @@ class MailMS(MSRequest):
 
         message = base64.encodebytes(message.as_bytes())
 
-        return self.post(f"users/{sender}/sendMail", message)
+        return self.post(f"users/{sender}/sendMail", message, encode=False)
 
     def send_welcome(self, sender: str, receiver: str, context, subj="Welcome to Teacher Su center"):
 

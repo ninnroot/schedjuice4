@@ -20,7 +20,7 @@ class UserMS(MSRequest):
         return super().get_list("users", headers=self.build_header())
 
     def create_with_req(self, request, password=None):
-        dic = request.POST
+        dic = request.data
         pw = dic.get("password")
         if password:
             pw = password
@@ -38,7 +38,7 @@ class UserMS(MSRequest):
         return self.post("users", data)
 
     def patch_with_req(self, request):
-        dic = request.POST
+        dic = request.data
         data = {
             "mail": dic.get("email"),
             "usageLocation": "SG"

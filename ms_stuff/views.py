@@ -12,7 +12,7 @@ class SignIn(APIView):
     def post(self, request):
 
         # request contains user's token obtained from client side
-        token = request.POST.get("token")
+        token = request.data.get("token")
 
         if token is None:
             return Response({"error":"A token must be provided"}, status=status.HTTP_400_BAD_REQUEST)

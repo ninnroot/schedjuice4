@@ -224,4 +224,4 @@ CORS_ALLOWED_ORIGINS=[
 
 # Custom settings
 
-SET_PERMISSION = True
+SET_PERMISSION = False

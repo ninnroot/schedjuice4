@@ -8,6 +8,23 @@ This is built to be highly maintainable and scalable and to last througout the a
 
 ## Installation
 The installation is straight-forward. It's just a normal Django project. For best practices, __you should use a virtual environment__.
+
+### making virtual environment
+
+__windows__
+```
+virtualenv env
+env\\Scripts\\activate.bat
+
+```
+
+__mac__
+```
+virtualenv env
+source env/bin/activate
+```
+
+### running the project
 ```
 mkdir <directory-name>
 cd <directory-name>
@@ -16,6 +33,9 @@ cd schedjuice4
 pip install -r requirements.txt
 python manage.py runserver
 ```
+
+## Installation for celery
+Celery 
 
 # External references and documentations
 Development of schedjuice4 was my learning journey as much as it's a practical need for my work. The followings are some references that I found

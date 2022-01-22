@@ -40,7 +40,7 @@ class GroupMS(MSRequest):
         # https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates
 
         if request:
-            name = request.POST.get("name")
+            name = request.data.get("name")
         name = name
 
         if name is None:
