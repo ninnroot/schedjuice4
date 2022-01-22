@@ -1,11 +1,13 @@
 from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from rest_framework import serializers
+
 from .models import Work, StaffWork, Session, StaffSession, Category
 from staff_stuff.models import Staff
 from role_stuff.serializers import RoleOnlySerializer
              
-from ms_stuff.graph_helper import GroupMS
-from ms_stuff.auth import get_token
+from ms_stuff.graph_wrapper.group import GroupMS
+from ms_stuff.graph_wrapper.user import UserMS
+
 
 
 class CategoryOnlySerializer(DynamicFieldsModelSerializer):
@@ -64,6 +66,17 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
         if obj is not None:
             raise serializers.ValidationError("Instance already exists.")
         return super().validate(data)
+
+    def create(self, data):
+        w = data["work"]
+        u = data["staff"]
+        res = UserMS(u.email).add_to_group(u.ms_id,w.ms_id,"owners")
+        
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json()})
+
+        return super().create(data)
+
     class Meta:
         model = StaffWork
         fields = "__all__"
@@ -96,8 +109,7 @@ class WorkSerializer(DynamicFieldsModelSerializer):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
         
         r = self.context.get("request")
-        work = GroupMS(get_token(r),"educationClass")
-        res = work.post(r)
+        res = GroupMS.create_group(r)
         
         if res.status_code not in range(199,300):
             raise serializers.ValidationError({"MS_error":res.json()})

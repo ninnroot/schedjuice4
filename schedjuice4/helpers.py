@@ -43,11 +43,15 @@ def getdetails_helper(self,request:Request,obj_id):
 
 
 def post_helper(self, request:Request):
+        silent = request.query_params.get("silent")
+        if silent is None:
+            silent = False
+            
         seri = self.serializer(
             data=request.data,
             read_only_fields=self.read_only_fields,
             excluded_fields=self.excluded_fields ,
-            context={"request":request}
+            context={"request":request,"silent":silent}
         )
         if seri.is_valid():
 
@@ -80,7 +84,10 @@ def delete_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
     seri = self.serializer(obj,context={"request":request}).data
     try:
-        obj.delete(r=request,silent=request.query_params.get("silent"))
+        silent = request.query_params.get("silent")
+        if silent is None:
+            silent = False
+        obj.delete(r=request,silent=silent)
         return Response(seri, status=status.HTTP_200_OK)
     
     except MSException as e:

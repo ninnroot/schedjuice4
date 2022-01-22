@@ -28,6 +28,7 @@ urlpatterns = [
     path("api/v1/", include("role_stuff.urls")),
     path("api/v1/", include("ms_stuff.urls")),
     path("api/v1/", include("wiki.urls")),
+    path("api/v1/", include("student_stuff.urls"))
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
 

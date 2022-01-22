@@ -1,4 +1,3 @@
-from statistics import mode
 from django.db import models
 from datetime import date, time
 
@@ -9,8 +8,7 @@ from .managers import UserManager
 
 from role_stuff.models import Role
 
-from ms_stuff.graph_helper import UserMS
-from ms_stuff.auth import get_token
+from ms_stuff.graph_wrapper.user import UserMS
 from ms_stuff.exceptions import MSException
 
 from schedjuice4.models import CustomModel
@@ -46,7 +44,15 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(max_length=16,default="")
     ph_num = models.CharField(max_length=60,default="09650222", validators=[RegexValidator(r'^\d{1,11}$')])
     facebook = models.CharField(max_length=256, default="https://facebook.com/profile")
+    
+    house_num = models.CharField(max_length=16, default="")
+    street = models.CharField(max_length=128, default="")
+    township = models.CharField(max_length=128, default="")
+    city = models.CharField(max_length=128, default="")
     region = models.CharField(max_length=8, default="0")
+    country = models.CharField(max_length=16, default="mm")
+    postal_code = models.CharField(max_length=12, default="")
+
     profile_pic = models.ImageField(default="profile_pics/default.jpg", upload_to="profile_pics") 
     cover_pic = models.ImageField(default="cover_pics/default.jpg", upload_to="cover_pics")
     card_pic = models.ImageField(default="card_pics/default.jpg", upload_to="card_pics")
@@ -84,7 +90,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
             "status",
             "role",
             "created_at",
-            "updated_at"
+            "updated_at",
 
         ]
     }
@@ -99,16 +105,18 @@ class Staff(AbstractBaseUser, PermissionsMixin):
         
         # deleting MS account
         try:
-            r = kwargs.pop("r")
-            res = UserMS(get_token(r)).delete(self.email)
             silent = kwargs.pop("silent")
             loud = not silent
 
-            if res.status_code not in range(199,300):
-                if res.status_code == 404 and loud:
-                    return super().delete(*args, **kwargs)
+            if loud:
 
-                raise MSException(detail=res.json())
+                r = kwargs.pop("r")
+                res = UserMS(self.email).delete()
+            
+                if res.status_code not in range(199,300):
+                    raise MSException(detail=res.json())
+                    
+            return super().delete(*args, **kwargs)
 
         except KeyError:
             pass

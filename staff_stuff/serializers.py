@@ -1,6 +1,4 @@
 
-from django.contrib.auth.hashers import make_password
-
 from rest_framework import serializers
 from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from work_stuff.serializers import StaffSessionSerializer
@@ -9,7 +7,7 @@ from .models import Department, Staff, Tag, StaffTag, StaffDepartment
 from work_stuff.serializers import StaffWorkSerializer
 from role_stuff.serializers import RoleOnlySerializer
 
-from .tasks import create_MS_user
+from ms_stuff.graph_wrapper.tasks import start_user_creation_flow
 
 
 # Only-serializers
@@ -163,8 +161,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         request = self.context.get("request")
         if not self.context.get("silent"):
             
-            create_MS_user(request, data)
-
+            start_user_creation_flow(request, data)
 
         status = data.get("status")
         if not status_check(status, self._status_lst):

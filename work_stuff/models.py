@@ -1,15 +1,17 @@
 from datetime import date, time
+from http.client import BAD_REQUEST
 from django.db import models
 from django.core.validators import RegexValidator
 
 from staff_stuff.models import Staff
 from role_stuff.models import Role
 
-from ms_stuff.graph_helper import GroupMS
-from ms_stuff.auth import get_token
+from ms_stuff.graph_wrapper.group import GroupMS
 
 from schedjuice4.models import CustomModel
 from ms_stuff.exceptions import MSException
+
+from django.core.exceptions import BadRequest
 
 class Category(CustomModel):
 
@@ -79,20 +81,22 @@ class Work(CustomModel):
     def delete(self, *args, **kwargs):
         
         # deleting MS team
-        try:
-            r = kwargs.pop("r")
-            res = GroupMS(get_token(r)).delete(self.ms_id)
+        silent = False
+        if "silent" in kwargs:
             silent = kwargs.pop("silent")
 
+        if not silent:
             
-            if res.status_code not in range(199,300):
-                if silent and res.status_code == 404:
-                    return super().delete(*args, **kwargs)
-                
-                raise(MSException(detail=res.json()))
+            # "r" should be in kwargs. It's called privately anyway.
+            r = kwargs.pop("r")
+            res = GroupMS(self.ms_id).delete(self.ms_id)
+        
 
-        except KeyError:
-            pass
+            if res.status_code not in range(199,300):
+                raise(MSException(detail=res.json()))
+            
+        return super().delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = "work"
@@ -148,11 +152,6 @@ class StaffWork(CustomModel):
         verbose_name_plural = "staffwork relations"
         ordering = ["-id"]
 
-    def save(self, *args, **kwargs):
-
-
-
-        return super().save(*args, **kwargs)
 
 class StaffSession(CustomModel):
 
