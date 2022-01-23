@@ -42,7 +42,7 @@ class SignIn(APIView):
 
         # generate access token for the user
         access = (RefreshToken.for_user(user).access_token)
-        access["role"] = user.role
+        access["role"] = user.role.shorthand
         access = str(access)
         return Response({"access":access},status=status.HTTP_200_OK)
 
