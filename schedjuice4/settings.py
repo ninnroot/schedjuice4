@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 import datetime
 from pathlib import Path
+from xmlrpc.client import FastParser
 from decouple import config
 from celery.schedules import crontab
 

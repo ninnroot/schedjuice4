@@ -10,6 +10,10 @@ from ms_stuff.exceptions import MSException
 
 
 def getlist_helper(self,request:Request):
+    
+    if request.query_params.get("utility") == "True":
+        
+        return Response({"fields":sorted([i.name for i in self.model._meta.get_fields()])})
     if not hasattr(self,"related_fields"):
         self.related_fields = []
     query = get_filter_query(self.model,request,pre=self.related_fields)

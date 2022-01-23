@@ -197,6 +197,7 @@ class IsOwnerOrReadOnly(BasePermission):
             return True
         
         return dic[role]
+        
 
 class RegistrationPhase(BasePermission):
     

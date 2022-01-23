@@ -4,7 +4,7 @@
 Schejuice 4 is an API for my school/work's staff management system as well as my passion project. This is built using the Django framework.
 As the name suggests, this is the fourth iteration of the "idea": the idea of a management system that is.
 
-This should be final version of the idea.
+This should be the final version of the idea.
 After this, I would like to pursue other areas of studies rather than web development (at least the web development in Python).
 This is built to be highly maintainable and scalable and to last througout the ages (at least I hope).  
 
@@ -136,6 +136,8 @@ Here are current list of non-specific roles:
 - Assistant teacher (atr)
 - Coordinator (cor)
 - Academic director (adr)
+
+or you can just send a GET request to <code>https://api.teachersucenter.com/api/v1/roles?specific=False</code>
 
 
 ***
