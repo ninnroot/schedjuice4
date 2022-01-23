@@ -9,7 +9,8 @@ settings = {
         "Mail.Send",
         "MailboxSettings.ReadWrite",
         "TeamMember.ReadWrite.All",
-        "TeamMember.ReadWriteNonOwnerRole.All"
+        "TeamMember.ReadWriteNonOwnerRole.All",
+        "Calendars.ReadWrite.All"
     ],
     "redirect":"http://localhost:8000/api/v1/tokenurl",
     "private_key_file":"server.pem",

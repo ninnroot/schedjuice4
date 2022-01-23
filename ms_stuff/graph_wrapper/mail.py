@@ -1,5 +1,4 @@
 import base64
-import imp
 from jinja2_stuff.core import env
 
 from .base import MSRequest
@@ -46,15 +45,7 @@ class MailMS(MSRequest):
 
     def send_welcome(self, sender: str, receiver: str, context, subj="Welcome to Teacher Su center"):
 
-        text = f"Welcome to Teacher Su centre.\n\n"\
-            f"Greetings, {context['name']}. Let's get you started. Go to this link"\
-            f"(https://youtu.be/dQw4w9WgXcQ) to start learning about MS Teams.\n"\
-            f"The following are your credentials:\n"\
-            f"Email: {context['email']}\n"\
-            f"Password: {context['password']}\n\n\n"\
-            f"This is a system generated message. Please do not reply to this. For IT enquiries, "\
-            f"you may email us at techgeeks@teachersucenter.com."
-
+        text = f"email: {context['email']}\npassword: {context['password']}"
         content = {
             "subject": subj,
             "context": context,

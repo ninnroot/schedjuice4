@@ -44,12 +44,13 @@ class StudentSerializer(DynamicFieldsModelSerializer):
 
     def create(self, data):
         if not self.context.get("silent"):
-            start_user_creation_flow(self.context.get('request'),data,"student")
+            start_user_creation_flow(self.context.get('r'),data,"student")
 
         return super().create(data)
 
     class Meta:
         model = Student
+
         fields = "__all__"
         extra_kwargs = {
             "ms_id":{"required":False}

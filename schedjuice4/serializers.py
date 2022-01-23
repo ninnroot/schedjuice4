@@ -11,7 +11,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
         fields = (kwargs.pop('fields', None))
         read_only_fields = kwargs.pop("read_only_fields",None)
         excluded_fields = kwargs.pop("excluded_fields", None)
-
+        
 
         if fields:
             fields = fields.split(",")

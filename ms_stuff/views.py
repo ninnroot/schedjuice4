@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from ms_stuff.graph_wrapper.mail import MailMS
 
 
+
 # Create your views here.
 class SignIn(APIView):
     def post(self, request):

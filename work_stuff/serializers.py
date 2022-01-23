@@ -108,7 +108,7 @@ class WorkSerializer(DynamicFieldsModelSerializer):
         if not status_check(status, self._status_lst):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
         
-        r = self.context.get("request")
+        r = self.context.get("r")
         res = GroupMS.create_group(r)
         
         if res.status_code not in range(199,300):

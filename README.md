@@ -262,5 +262,11 @@ how MIME works while sending emails.
 
 see [here](https://realpython.com/python-send-email/)
 
+## Outlook calendar overview
+just to help you get started on Outlook calendar.
+
+see [here](https://docs.microsoft.com/en-us/graph/outlook-calendar-concept-overview)
+
+
 </details>
 

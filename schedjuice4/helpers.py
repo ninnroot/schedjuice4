@@ -24,7 +24,7 @@ def getlist_helper(self,request:Request):
         fields=request.query_params.get("fields"),
         read_only_fields=self.read_only_fields,
         excluded_fields=self.excluded_fields,
-        context={"request":request}
+        context={"r":request}
         )
     
     
@@ -40,7 +40,7 @@ def getdetails_helper(self,request:Request,obj_id):
         fields=request.query_params.get("fields"),
         read_only_fields=self.read_only_fields,
         excluded_fields=self.excluded_fields,
-        context={"request":request}
+        context={"r":request}
         )
     
     return Response(seri.data, status=status.HTTP_200_OK)
@@ -55,7 +55,7 @@ def post_helper(self, request:Request):
             data=request.data,
             read_only_fields=self.read_only_fields,
             excluded_fields=self.excluded_fields ,
-            context={"request":request,"silent":silent}
+            context={"r":request,"silent":silent}
         )
         if seri.is_valid():
 
@@ -74,7 +74,7 @@ def put_helper(self,request:Request, obj_id):
         data=request.data,partial=True,
         read_only_fields=self.read_only_fields,
         excluded_fields=self.excluded_fields,
-        context={"request":request}
+        context={"r":request}
         )
     
     if seri.is_valid():
@@ -86,7 +86,7 @@ def put_helper(self,request:Request, obj_id):
 
 def delete_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
-    seri = self.serializer(obj,context={"request":request}).data
+    seri = self.serializer(obj,context={"r":request}).data
     try:
         silent = request.query_params.get("silent")
         if silent is None:
