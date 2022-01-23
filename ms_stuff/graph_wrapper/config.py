@@ -8,7 +8,7 @@ constants = {
     },
 
     "SECURITY_GROUPS":{
-        "allstaff":"14bef87e-d8d9-4e04-8c36-d07ecaa05fda",
+        "allstaff":"b305068d-ceca-4358-aed9-ad7d3ea16938",
         "allstudents": "5b55f9b9-987b-4388-98e8-fb8c2af215a4"
     },
 

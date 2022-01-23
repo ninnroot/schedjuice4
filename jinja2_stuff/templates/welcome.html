@@ -1,65 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>email</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-    body{
-      margin: 0;
-      padding: 0%;
-      box-sizing: border-box;
-      font-family: 'Saira', sans-serif;
-      background: rgb(0, 53, 122);
-    }
-    .para{
-        width: 70%;
-        margin: 0px auto;
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Saira:wght@300;400;700&display=swap");
+      html, body {
+        font-family: "Saira", sans-serif;
       }
-    @media only screen and (max-width:1253px){
-      .para{
-        width: 90%;
-      }
-    }
-  </style>
-</head>
-<body>
-    <div style="background: rgb(255, 255, 255);">
-
-      
-
-        <div style="display: flex;align-items: center;justify-content: center;background: rgb(0, 53, 122);padding: 10px;">
-          <div style="display: flex;align-items: center;justify-content: center;flex-direction: column;">
-              <img src="https://teachersucenter.com/img/logo.0b1236bc.png" width="100px" alt="">
-              <p style="text-align: center;font-size: 3rem;font-weight: bold;color: whitesmoke;">Welcome to Teacher Su Centre</p>
-          </div>
-        </div>
-
-        <div style="display: flex;align-items: center;justify-content: center;background: rgb(0, 53, 122);padding: 10px;">
-           <img src="https://media.giphy.com/media/PAqjdPkJLDsmBRSYUp/giphy.gif" class="img" alt="">
-        </div>
-
-        <div style="background: rgb(0, 53, 122);">
-            <div class="para" style="text-align: center;padding: 10px;font-size: 1.1rem;color: whitesmoke;line-height: 30px;">
-                
-                    <p>Email: {{context.email}}</p>
-                    <p>Password: {{context.password}}</p>
-                
-              <p>Greetings <b>{{context.name}}</b>, let's get you started.
-                To log in, go to https://www.office.com. 
-                Click this <a href="https://youtu.be/dQw4w9WgXcQ">link</a> to download the starting resouces.</p>
-            </div>
-        </div>
-
-        <div style="background: rgb(175, 20, 0);display: flex;align-items: center;justify-content: center;padding: 30px;">
-          <p style="margin: 0%;text-align: center;font-weight: bolder;color: whitesmoke;">
-            This is a system generated message. Please do not reply to this. For IT enquiries,
-            you may email us at techgeeks@teachersucenter.com.
-          </p>
-          <br>
-        </div>
-    </div>
-</body>
+    </style>
+  </head>
+  <body>
+    <div
+      style="width: 100%; max-width: 768px; margin-left: auto; margin-right: auto; padding: 1rem"
+    >
+      <img
+        src="https://api.teachersucenter.com/media2/logoremote.png"
+        alt="Teacher Su Center"
+        width="80px"
+        height="80px"
+        style="margin-bottom: 1rem"
+      />
+      <h1 style="margin-top: 0">Hi, Welcome to Teacher Su Center</h1>
+      <p>
+        Voluptate ea sint elit anim ex deserunt dolor. Ad nisi excepteur qui tempor ipsum deserunt
+        nulla qui ipsum qui. Eiusmod enim aliqua voluptate mollit sint deserunt aliquip quis.
+        Laboris proident consectetur esse nulla exercitation.
+      </p>
+      <p>
+        email: me@example.com
+        <br />
+        passwords: p@ssw0rd5
+      </p>
+      <p>
+        Do irure occaecat exercitation nulla nisi ut ipsum magna est voluptate ex voluptate aliquip.
+        Elit id reprehenderit sit Lorem ipsum nostrud ut sit mollit cillum exercitation culpa. Lorem
+        elit veniam labore enim culpa amet elit fugiat mollit nulla est tempor aliqua. Pariatur
+        fugiat sunt aute ut ut nostrud. Tempor quis magna non consequat proident voluptate mollit
+        eiusmod duis enim aliqua veniam officia deserunt.
+      </p>
+      <h1 style="margin-top: 0; margin-bottom: 1rem; color: #333">Teacher Su Center</h1>
+      <hr style="border-color: #ccc; border-width: 1px" />
+      <p style="font-size: 0.8rem;">
+        Ipsum fugiat excepteur nisi sit nisi quis mollit officia quis laboris esse. Ad sint
+        cupidatat sunt et exercitation mollit cillum ullamco excepteur laborum qui cupidatat. Ad do
+        ex tempor laborum commodo ullamco irure. Labore proident qui est eu. Eiusmod laboris aliquip
+        mollit irure ut consequat Lorem nulla.
+      </p>
+      <hr style="border-color: #ccc; border-width: 1px; margin-bottom: 1rem" />
+      <div style="margin-bottom: 1rem; font-size: .8rem;">
+        <a href="#" style="color: rgb(82 82 82); margin-right: 1rem">IT SUPPORT</a> |
+        <a href="#" style="color: rgb(82 82 82); margin: 0 1rem">GO TO MS TEAM</a> |
+        <a href="#" style="color: rgb(82 82 82); margin-left: 1rem">CONTACT US</a>
+      </div>
+      <div style="font-size: .8rem;">&copy; TECH TEAM - TEACHER SU CENTER</div>
+    </footer>
+  </body>
 </html>

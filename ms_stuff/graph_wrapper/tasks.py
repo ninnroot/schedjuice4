@@ -41,6 +41,6 @@ def start_user_creation_flow(request, data, user_type:str, mail=True, pw=None):
 
     if user_type == "staff":
         # add to security group
-        res = user.add_to_group(data["ms_id"],constants["SECURITY_GROUP"]["allstaff"],"members")
+        res = user.add_to_group(data["ms_id"],constants["SECURITY_GROUPS"]["allstaff"],"members")
         res = raise_error(res, "security group")
 

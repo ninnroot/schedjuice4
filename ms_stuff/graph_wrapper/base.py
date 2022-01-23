@@ -83,7 +83,7 @@ class MSRequest:
         x = URL
         if beta:
             x = BETA_URL
-        return requests.delete(x+url, headers=self.build_header())
+        return requests.delete(x+url, headers=self.headers)
 
     def get_licenses(self):
         return self.get("subscribedSkus")

@@ -228,4 +228,4 @@ CORS_ALLOWED_ORIGINS=[
 
 # Custom settings
 
-SET_PERMISSION = False
+SET_PERMISSION = True

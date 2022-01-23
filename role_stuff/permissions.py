@@ -155,11 +155,11 @@ class IsOwnerOrReadOnly(BasePermission):
             return True
 
         role = get_role_helper(request)
-
         if role is None:
             self.message = "User has no role provided."
             return False
         else:
+            
             if request.method == "GET":
                 return True
 

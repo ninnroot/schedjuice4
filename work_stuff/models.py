@@ -89,7 +89,7 @@ class Work(CustomModel):
             
             # "r" should be in kwargs. It's called privately anyway.
             r = kwargs.pop("r")
-            res = GroupMS(self.ms_id).delete(self.ms_id)
+            res = GroupMS(self.ms_id).delete()
         
 
             if res.status_code not in range(199,300):

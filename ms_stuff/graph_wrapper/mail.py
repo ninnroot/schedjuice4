@@ -25,24 +25,24 @@ class MailMS(MSRequest):
 
     def _send(self, sender, receiver, content):
 
-        if settings.DEBUG:
-            receiver = constants["TEST_EMAIL"]
-
         message = MIMEMultipart("alternative")
         message["Subject"] = content["subject"]
         message["From"] = sender
         message["To"] = receiver
 
         text = MIMEText(content["text"], "plain")
-        html = MIMEText(self.make_template(
-            content["template"], content["context"]), "html")
+        
 
         message.attach(text)
-        # message.attach(html)
+        if "context" in content:
+            html = MIMEText(self.make_template(
+                content["template"], content["context"]), "html")
+            message.attach(html)
 
         message = base64.encodebytes(message.as_bytes())
 
         return self.post(f"users/{sender}/sendMail", message, encode=False)
+
 
     def send_welcome(self, sender: str, receiver: str, context, subj="Welcome to Teacher Su center"):
 
@@ -62,3 +62,18 @@ class MailMS(MSRequest):
             "text": text
         }
         return self._send(sender, receiver, content=content)
+
+
+    def send_from_request(self, request):
+        text = request.data.get("text")
+        
+        if request.data.get("system"):
+            text+="\n\nThis is a system generated email. Please do not reply to this.\n"\
+                "For IT enquiries, you may email as at techgeeks@teachersucenter.com"
+
+        content = {
+            "subject":request.data.get("subject"),
+            "text":text
+
+        }
+        return self._send(constants["STAFFY_ID"],request.data.get("receiver"),content=content)

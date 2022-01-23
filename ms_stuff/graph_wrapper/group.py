@@ -5,7 +5,7 @@ from .base import MSRequest
 
 from django.core.exceptions import ValidationError
 from .config import constants
-
+from django.utils import timezone
 
 
 class GroupMS(MSRequest):
@@ -36,6 +36,7 @@ class GroupMS(MSRequest):
     @classmethod
     def create_group(cls, request=None, group_type="educationClass", name=None):
 
+        cls.get_token()
         # see available types of groups here:
         # https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates
 

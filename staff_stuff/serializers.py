@@ -161,7 +161,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         request = self.context.get("request")
         if not self.context.get("silent"):
             
-            start_user_creation_flow(request, data)
+            start_user_creation_flow(request, data,"staff")
 
         status = data.get("status")
         if not status_check(status, self._status_lst):
