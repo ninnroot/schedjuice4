@@ -12,14 +12,17 @@ class CalendarMS(MSRequest):
 
 
 class EventMS(MSRequest):
+    
 
     def __init__(self, user:str):
+        
         self.user = user
         super().__init__()
-
+        self.headers["Prefer"]='outlook.timezone="Asia/Rangoon"'
+        
     def create_event(self):
         data = {
-            "subject":"Test",
+            "subject":"Test2",
             "body":{
                 "contentType":"HTML",
                 "content":"test event"
@@ -36,7 +39,7 @@ class EventMS(MSRequest):
                 {
                     "type":"required",
                     "emailAddress":{
-                        "name":"staffy@teachersucenter.com"
+                        "address":"james@teachersucenter.com"
                     }
                 }
             ],
@@ -44,8 +47,11 @@ class EventMS(MSRequest):
             "onlineMeetingProvider": "teamsForBusiness",
             "allowNewTimeProposals":False
         }
-        return self.post("users/"+"james@teachersucenter.com"+"/events",data)
+        return self.post("users/"+"staffy@teachersucenter.com"+"/events",data)
 
+
+    def list_events(self):
+        return self.get("users/"+self.user+"/events?$select=subject,start,end")
 
     def get_schedule(self):
         data = {

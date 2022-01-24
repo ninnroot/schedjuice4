@@ -53,6 +53,26 @@ celery -A schedjuice4 worker -l INFO
 celery -A schedjuice4 beat -l INFO
 ```
 
+## Request headers
+For every request, an authorization header with a Bearer token. must be provided. See [here](#Authentication) on how to obtain it.
+```http
+Authorization: Bearer <token>
+```
+
+
+## Filtering and specifying fields
+You can filter what kind of instances you want to receive.
+```http
+GET https://api.teachersucenter.com/api/v1/staff?x=Foo&y=Bar
+```
+
+
+You can also specify which fields you want in the response (so that the response body won't be large). By default, the server will return every field. For performance reason, I highly recommend to specify the fields you want to obtain.
+```http
+GET https://api.teachersucenter.com/api/v1?fields=name,id,email
+```
+
+
 ## Authentication
 Authentication is simple. Microsoft's Graph API handled most of it. However, [we](https://github.com/teachersucenter) only use MS mostly for authentication and application of its ohter services. What I am trying to say it, there are still a lot of data stored on our database. So, our own authentication is also still needed. (not sure how other do this. But, we came up with the following idea.)
 
