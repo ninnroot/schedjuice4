@@ -16,8 +16,10 @@ class UserMS(MSRequest):
     def get(self):
         return super.get("users/"+self.user)
 
-    def get_list(self):
-        return super().get_list("users", headers=self.build_header())
+    @classmethod
+    def get_list(cls):
+        cls.get_token()
+        return super().get_list("users")
 
     def create_with_req(self, request, password=None):
         dic = request.data

@@ -7,6 +7,7 @@ from role_stuff.serializers import RoleOnlySerializer
              
 from ms_stuff.graph_wrapper.group import GroupMS
 from ms_stuff.graph_wrapper.user import UserMS
+from ms_stuff.graph_wrapper.outlook import EventMS
 
 
 
@@ -48,6 +49,17 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
             raise serializers.ValidationError("Staff is not related to Session's Work.")
         return data
 
+    def create(self, data):
+        print(data)
+        x = StaffSession.objects.create(**data)
+        
+        res = EventMS.create_event_for_staffsession(x)
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json()})
+        
+        x.save()
+        return x
+
     class Meta:
         model = StaffSession
         fields = "__all__"
@@ -75,7 +87,7 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
         if res.status_code not in range(199,300):
             raise serializers.ValidationError({"MS_error":res.json()})
 
-        return super().create(data)
+        return super().create(data,)
 
     class Meta:
         model = StaffWork
@@ -107,7 +119,11 @@ class WorkSerializer(DynamicFieldsModelSerializer):
         status = data.get("status")
         if not status_check(status, self._status_lst):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
-        
+
+        return super().validate(data) 
+
+    
+    def create(self, data):
         r = self.context.get("r")
         res = GroupMS.create_group(r)
         
@@ -119,7 +135,19 @@ class WorkSerializer(DynamicFieldsModelSerializer):
         gp_id = res.headers["Content-Location"].split("'")[1::2][0]
         data["ms_id"] = gp_id
 
-        return super().validate(data) 
+
+    def update(self, instance, data):
+
+        if data.get("organizer"):
+            x = data.get("organizer")
+            res = UserMS(x).add_to_group(x.ms_id,instance.ms_id,"owners")
+            if res.status_code not in range(199,300):
+                return serializers.ValidationError({"MS_error":res.json(),"step":"adding organizer"})
+            
+            instance = super().update(instance,data)
+
+            return instance
+
 
     class Meta:
         model = Work

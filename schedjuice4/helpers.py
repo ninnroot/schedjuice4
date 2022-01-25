@@ -34,6 +34,7 @@ def getlist_helper(self,request:Request):
 def getdetails_helper(self,request:Request,obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
     self.check_object_permissions(self.request,obj)
+
     
     seri = self.serializer(
         obj,

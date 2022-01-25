@@ -1,9 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timezone
+import json
+
 from .base import MSRequest
+from ms_stuff.exceptions import WrapperException
 
 from django.utils import timezone
-
 from django.conf import settings
+
+from work_stuff.models import Work,Session, StaffSession
 
 
 class CalendarMS(MSRequest):
@@ -12,62 +16,125 @@ class CalendarMS(MSRequest):
 
 
 class EventMS(MSRequest):
-    
 
-    def __init__(self, user:str):
+    api_timezone = "Asia/Singapore"
+
+    def __init__(self, event:str):
         
-        self.user = user
+        self.user = event
         super().__init__()
         self.headers["Prefer"]='outlook.timezone="Asia/Rangoon"'
+
+
+    @staticmethod
+    def get_commons():
+        return {
+            "allowNewTimeProposals":False,
+            "isOnlineMeeting":True,
+            "onlineMeetingProvider":"teamsForBusiness"
+        }
+
+
+    @classmethod
+    def time_maker(cls, session:Session):
+        x=session.time_from
+        y = session.time_to
+        a = session.work.valid_from
+        x = datetime(a.year,a.month,a.day,x.hour,x.minute,x.second)
+        y = datetime(a.year,a.month,a.day,y.hour,y.minute,y.second)
         
-    def create_event(self):
+        tz = timezone.activate("Asia/Rangoon")
+        time_from = (x.astimezone(tz))
+        time_to = (y.astimezone(tz))
+
+
+        return {
+            "start":{
+                "dateTime":time_from.isoformat(),
+                "timeZone":cls.api_timezone
+                },
+            "end":{
+                "dateTime":time_to.isoformat(),
+                "timeZone":cls.api_timezone
+                }
+            }
+
+    @classmethod
+    def range_maker(cls, work:Work):
+
+        return {
+            "type":"endDate",
+            "startDate":work.valid_from.isoformat(),
+            "endDate":work.valid_to.isoformat(),
+            "recurrenceTimeZone":cls.api_timezone,
+            "numberOfOccurrences":0
+        }
+
+
+    @classmethod
+    def get_attendees(cls, session:Session):
+        
+        x = StaffSession.objects.filter(session=session).all()
+        if x == []:
+            raise WrapperException("No such session.")
+        
+        lst = []
+
+        for i in x:
+            lst.append({
+                "emailAddress":{
+                    "address":i.staff.email,
+                    "name":i.staff.dname
+                    },
+                "type":"required"
+                })
+
+        return lst
+
+
+    @classmethod
+    def create_event_for_staffsession(cls, staffsession:StaffSession):
+        cls.get_token()
+        session = staffsession.session
         data = {
-            "subject":"Test2",
+            "subject":str(session),
             "body":{
                 "contentType":"HTML",
-                "content":"test event"
+                "content":f"created by Schedjuice4 at {timezone.now()}"
             },
-            "start":{
-                "dateTime":timezone.datetime(2022,1,24,16,40).isoformat(),
-                "timeZone":"Asia/Singapore"
+            "recurrence":{
+                "pattern":{
+                    "type":"weekly",
+                    "interval":1,
+                    "daysOfWeek":[cls.day_mapper[int(session.day)]]
+                },
+                "range":cls.range_maker(session.work),
             },
-            "end":{
-                "dateTime":timezone.datetime(2022,1,24,18,40).isoformat(),
-                "timeZone":"Asia/Singapore"
-            },
-            "attendees":[
-                {
-                    "type":"required",
-                    "emailAddress":{
-                        "address":"james@teachersucenter.com"
-                    }
-                }
-            ],
-            "isOnlineMeeting": True,
-            "onlineMeetingProvider": "teamsForBusiness",
-            "allowNewTimeProposals":False
-        }
-        return self.post("users/"+"staffy@teachersucenter.com"+"/events",data)
-
-
-    def list_events(self):
-        return self.get("users/"+self.user+"/events?$select=subject,start,end")
-
-    def get_schedule(self):
-        data = {
-            "schedules":["james@teachersucenter.com","staffy@teachersucenter.com"],
-            "startTime":{
-                "dateTime":datetime(2022,1,20).isoformat(),
-                "timeZone":"Asia/Singapore"
-            },
-            "endTime":{
-   
-                "dateTime":datetime(2022,1,28).isoformat(),
-                "timeZone":"Asia/Singapore"
             
-            }
+
+            "organizer":{
+                "emailAddress":{
+                    "address":session.work.organizer.email,
+                    "name":session.work.organizer.dname
+                }
+            },
+
+            # these are attendees
+            "attendees":cls.get_attendees(session),
+
+            # start and end time
+            **cls.time_maker(session),
+
+            # common properties
+            **cls.get_commons()
+            
         }
-        return self.post("users/james@teachersucenter.com/calendar/getSchedule",data)
+        x = open('mmsp.json',"w").write(json.dumps(data))
+        
+
+        return cls.post(f"users/{staffsession.staff.ms_id}/calendar/events",data)
+        
+        
 
 
 

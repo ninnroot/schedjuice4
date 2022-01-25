@@ -35,6 +35,17 @@ class MSRequest:
     Basically, I am building my own wrapper.
     """
 
+    day_mapper = {
+        0:"Monday",
+        1:"Tuesday",
+        2:"Wednesday",
+        3:"Thursday",
+        4:"Friday",
+        5:"Saturday",
+        6:"Sunday"
+    }
+
+
     @staticmethod
     def get_token():
         x = get_msal_app()
@@ -64,14 +75,15 @@ class MSRequest:
             x = BETA_URL
         return requests.get(x+url, headers=self.headers)
 
-    def post(self, url, data, beta=False, encode=True):
+    @classmethod
+    def post(cls, url, data, beta=False, encode=True):
         x = URL
         if beta:
             x = BETA_URL
 
         if encode:
             data=json.dumps(data)
-        return requests.post(x+url, data, headers=self.headers)
+        return requests.post(x+url, data, headers=cls.headers)
 
     def patch(self, url, data, beta=False):
         x = URL

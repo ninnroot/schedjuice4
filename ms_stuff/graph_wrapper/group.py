@@ -68,8 +68,13 @@ class GroupMS(MSRequest):
     def get(self):
         return super().get("groups/"+self.group)
 
-    def get_list(self):
+    @classmethod
+    def get_list(cls):
+        cls.get_token()
         return super().get_list("groups")
 
     def delete(self):
         return super().delete("groups/"+self.group)
+
+    
+        

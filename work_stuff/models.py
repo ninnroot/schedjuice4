@@ -11,7 +11,7 @@ from ms_stuff.graph_wrapper.group import GroupMS
 from schedjuice4.models import CustomModel
 from ms_stuff.exceptions import MSException
 
-from django.core.exceptions import BadRequest
+
 
 class Category(CustomModel):
 
@@ -42,9 +42,8 @@ class Work(CustomModel):
     name = models.CharField(max_length=256,unique=True)
     ms_id = models.CharField(max_length=256, unique=True)
     description = models.TextField(default="Description...")
-    meeting_id = models.CharField(max_length=20,default="not provided",validators=[RegexValidator(r'^\d{1,11}$ ')])
-    viber_group = models.CharField(max_length=256,default="https://")
-    class_code = models.CharField(max_length=8, default="#code")
+    organizer = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True)
+
     valid_from = models.DateField(default=date(2000,1,1))
     valid_to = models.DateField(default=date(2000,12,1))
     # statuses = ["pending", "ready" ,"active", "ended", "on halt"]
@@ -131,6 +130,10 @@ class Session(CustomModel):
         ]
     }
 
+    def __str__(self):
+        return f"{self.work}:{self.day}:{self.time_from}-{self.time_to}"
+        
+
     class Meta:
         verbose_name = "session"
         verbose_name_plural = "sessions"
@@ -147,6 +150,12 @@ class StaffWork(CustomModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    read_only_fields = {
+        "SDM":[],
+        "ADM":["created_at","updated_at"],
+        "USR":["staff","work","role","created_at","updated_at"]
+    }
+
     class Meta:
         verbose_name = "staffwork relation"
         verbose_name_plural = "staffwork relations"
@@ -161,6 +170,12 @@ class StaffSession(CustomModel):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    read_only_fields = {
+        "SDM":[],
+        "ADM":["created_at","updated_at"],
+        "USR":["staff","session","role","created_at","updated_at"]
+    }
 
     class Meta:
         verbose_name = "staffsession relation"

@@ -317,5 +317,6 @@ see [here](https://docs.microsoft.com/en-us/graph/outlook-calendar-concept-overv
 
 ## Authors
 [Thiha Swan Htet](https://github.com/Ninroot-Eater)(me 😁)
+
 [Hein Thant](https://github.com/heinthanth)(for making email templates [here](./jinja2_stuff/templates/))
 
