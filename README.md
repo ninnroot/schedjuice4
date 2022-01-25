@@ -10,6 +10,17 @@ This is built to be highly maintainable and scalable and to last througout the a
 
 The frontend of this api can be found [here](https://github.com/teachersucenter/simp-v2). It was developed by my amazing tech team from [teachersucenter](https://www.teachersucenter.com).
 
+
+## Technologies used
+This is built entirely out of Python using the [Django](https://www.djangoproject.com/) and the [Django REST framework](https://www.django-rest-framework.org/). 
+
+Another major technology would be the [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/use-the-api).
+
+Important libraries to look into would be [Celery](https://docs.celeryproject.org/en/stable/django/first-steps-with-django.html) and [Jinja2](https://jinja.palletsprojects.com/en/3.0.x/).
+
+The database of choice is [Postgresql](https://www.postgresql.org/) as it's recommended by Django.
+
+
 ## Installation
 The installation is straight-forward. It's just a normal Django project. For best practices, __you should use a virtual environment__.
 
@@ -53,6 +64,12 @@ celery -A schedjuice4 worker -l INFO
 celery -A schedjuice4 beat -l INFO
 ```
 
+## Important information about Schedjuice4
+- Endpoint = "api.teachersucenter.com/api/v1"
+- Protocol = https
+- Allowed methods = ["GET", "POST", "PUT", "DELETE"]
+
+
 ## Request headers
 For every request, an authorization header with a Bearer token. must be provided. See [here](#Authentication) on how to obtain it.
 ```http
@@ -60,15 +77,23 @@ Authorization: Bearer <token>
 ```
 
 
-## Filtering and specifying fields
-You can filter what kind of instances you want to receive.
-```http
+## Filtering, pagination and specifying fields
+In every request, you can add extra query parameters to customize the response body.
+
+
+You can filter what kind of instances you want to receive. You can do this to any resource endpoint.
+```
 GET https://api.teachersucenter.com/api/v1/staff?x=Foo&y=Bar
+```
+
+You can specify pagination. By default, the server returns the first 100 results. You can change this by providing a <code>>size</code> parameter and specify the page number with the <code>page</code> parameter.
+```
+GET https://api.teachersucenter.com/api/v1/staff?page=&size=20
 ```
 
 
 You can also specify which fields you want in the response (so that the response body won't be large). By default, the server will return every field. For performance reason, I highly recommend to specify the fields you want to obtain.
-```http
+```
 GET https://api.teachersucenter.com/api/v1?fields=name,id,email
 ```
 
@@ -289,4 +314,8 @@ see [here](https://docs.microsoft.com/en-us/graph/outlook-calendar-concept-overv
 
 
 </details>
+
+## Authors
+[Thiha Swan Htet](https://github.com/Ninroot-Eater)(me 😁)
+[Hein Thant](https://github.com/heinthanth)(for making email templates [here](./jinja2_stuff/templates/))
 
