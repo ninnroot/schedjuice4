@@ -28,10 +28,27 @@ class WorkOnlySerializer(DynamicFieldsModelSerializer):
         model = Work
         fields = "__all__"
 
+
 class SessionSerializer(DynamicFieldsModelSerializer):
+    
+    def create(self, data):
+
+        x = Session.objects.create(**data)
+        
+        res = EventMS.create_event_for_session(x)
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json})
+
+        x.event_id = res["id"]
+        x.save()
+        return x
+
     class Meta:
         model = Session
         fields = "__all__"
+        extra_kwargs = {
+            "event_id":{"required":False}
+        }
 
 
 class StaffSessionSerializer(DynamicFieldsModelSerializer):
@@ -39,26 +56,32 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
     session_details = SessionSerializer(source="session",fields="id,work,day,time_from,time_to", read_only=True)
     role_details = RoleOnlySerializer(source="role_set", fields="id,name,shorthand,is_specific", read_only=True)
 
+
     def validate(self, data):
         s = data.get("staff")
         se = data.get("session")
-            
         
-        obj = StaffWork.objects.filter(staff=s, work=se.work).first()
-        if obj is None:
+        obj = StaffSession.objects.filter(staff=s,session=se).exists()
+        if not obj:
+            raise serializers.ValidationError("Instance already exists.")
+        
+        obj = StaffWork.objects.filter(staff=s, work=se.work).exists()
+        if not obj:
             raise serializers.ValidationError("Staff is not related to Session's Work.")
         return data
 
+
     def create(self, data):
-        print(data)
-        x = StaffSession.objects.create(**data)
-        
-        res = EventMS.create_event_for_staffsession(x)
+        se = data.get("session")
+        e = EventMS(se.event_id,se.work.organizer.email)
+        res = e.add_attendee(data.get("staff"),StaffSession.objects.filter(session=se).all())
+
         if res.status_code not in range(199,300):
             raise serializers.ValidationError({"MS_error":res.json()})
         
-        x.save()
-        return x
+        
+        return super().create(data)
+
 
     class Meta:
         model = StaffSession

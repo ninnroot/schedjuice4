@@ -1,3 +1,4 @@
+from operator import mod
 from work_stuff.models import Work
 from django.db import models
 from schedjuice4.models import CustomModel
@@ -13,6 +14,8 @@ class Student(CustomModel):
 
     email =  models.EmailField(unique=True)
     ms_id = models.CharField(max_length=256, unique=True)
+    
+    password = models.CharField(max_length=256)
     dname = models.CharField(max_length=128, default="Display Name")
     ename = models.CharField(max_length=128, default="Nickname")
     description = models.TextField(default="Description...")
@@ -36,9 +39,9 @@ class Student(CustomModel):
     updated_at = models.DateTimeField(auto_now=True)  
 
     read_only_fields = {
-        "SDM":"",
-        "ADM":"email",
-            
+        "SDM":[],
+        "ADM":["email","password"],
+             
     }  
 
     class Meta:
@@ -53,7 +56,12 @@ class StudentWork(CustomModel):
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)    
+    updated_at = models.DateTimeField(auto_now=True)
+
+    read_only_fields = {
+        "SDM":[],
+        "ADM":["created_at","updated_at"],
+    }    
 
     class Meta:
         verbose_name = "student_work"

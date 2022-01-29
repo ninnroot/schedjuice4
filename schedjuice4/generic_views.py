@@ -17,6 +17,8 @@ class GeneralList(APIView,CustomPagination):
     def post(self, request):
         return post_helper(self,request)
 
+
+
 class GeneralDetails(APIView,CustomPagination):
     permission_classes = []
     related_fields = []

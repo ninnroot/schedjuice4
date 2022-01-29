@@ -158,11 +158,6 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
     def validate(self, data):
 
-        request = self.context.get("r")
-        if not self.context.get("silent"):
-            
-            start_user_creation_flow(request, data,"staff")
-
         status = data.get("status")
         if not status_check(status, self._status_lst):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
@@ -171,7 +166,12 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
 
     def create(self, validated_data):
-        
+
+        request = self.context.get("r")
+        if not self.context.get("silent"):
+            
+            start_user_creation_flow(request, validated_data,"staff")
+
         password = validated_data.pop('password')
         user = super().create(validated_data)
         user.set_password(password)
@@ -179,7 +179,10 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
         return user
 
+
     def update(self, instance, data):
+
+        
         
         password = data.pop("password", None)
         if password:

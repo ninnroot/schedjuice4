@@ -12,11 +12,8 @@ def raise_error(request,step:str):
     
     return request
 
-def start_user_creation_flow(request, data, user_type:str, mail=True, pw=None):
+def start_user_creation_flow(request, data, pw, user_type:str, mail=True):
     user = UserMS(request.data.get("email"))
-
-    if pw is None:
-        pw = constants["DEFAULT_PASSWORD"]
 
     # create MS user
     res = raise_error(user.create_with_req(request,pw),"create")
@@ -34,7 +31,7 @@ def start_user_creation_flow(request, data, user_type:str, mail=True, pw=None):
 
     # send welcome email (optional step)
     if mail:
-        context = {"name": data["dname"], "email":data["email"], "password":pw}
+        context = {"name": data["dname"], "email":data["email"], "password":data["password"]}
         res = MailMS().send_welcome("staffy@teachersucenter.com",data["email"],context)
         res = raise_error(res, "mail sending")
 

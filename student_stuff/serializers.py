@@ -53,7 +53,8 @@ class StudentSerializer(DynamicFieldsModelSerializer):
 
         fields = "__all__"
         extra_kwargs = {
-            "ms_id":{"required":False}
+            "ms_id":{"required":False},
+            "password":{"write_only":True}
         }
 
 

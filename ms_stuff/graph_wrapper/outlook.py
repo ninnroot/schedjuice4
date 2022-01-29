@@ -7,7 +7,8 @@ from ms_stuff.exceptions import WrapperException
 from django.utils import timezone
 from django.conf import settings
 
-from work_stuff.models import Work,Session, StaffSession
+from staff_stuff.models import Staff
+
 
 
 class CalendarMS(MSRequest):
@@ -19,9 +20,11 @@ class EventMS(MSRequest):
 
     api_timezone = "Asia/Singapore"
 
-    def __init__(self, event:str):
+    def __init__(self, event:str, organizer_id:str):
         
-        self.user = event
+        self.event = event
+        self.organizer = organizer_id
+        
         super().__init__()
         self.headers["Prefer"]='outlook.timezone="Asia/Rangoon"'
 
@@ -36,7 +39,7 @@ class EventMS(MSRequest):
 
 
     @classmethod
-    def time_maker(cls, session:Session):
+    def time_maker(cls, session):
         x=session.time_from
         y = session.time_to
         a = session.work.valid_from
@@ -60,7 +63,7 @@ class EventMS(MSRequest):
             }
 
     @classmethod
-    def range_maker(cls, work:Work):
+    def range_maker(cls, work):
 
         return {
             "type":"endDate",
@@ -72,9 +75,9 @@ class EventMS(MSRequest):
 
 
     @classmethod
-    def get_attendees(cls, session:Session):
+    def get_attendees(cls, query_set):
         
-        x = StaffSession.objects.filter(session=session).all()
+        x = query_set
         if x == []:
             raise WrapperException("No such session.")
         
@@ -93,9 +96,8 @@ class EventMS(MSRequest):
 
 
     @classmethod
-    def create_event_for_staffsession(cls, staffsession:StaffSession):
+    def create_event_for_session(cls, session):
         cls.get_token()
-        session = staffsession.session
         data = {
             "subject":str(session),
             "body":{
@@ -110,8 +112,6 @@ class EventMS(MSRequest):
                 },
                 "range":cls.range_maker(session.work),
             },
-            
-
             "organizer":{
                 "emailAddress":{
                     "address":session.work.organizer.email,
@@ -119,24 +119,48 @@ class EventMS(MSRequest):
                 }
             },
 
-            # these are attendees
-            "attendees":cls.get_attendees(session),
-
             # start and end time
             **cls.time_maker(session),
 
             # common properties
             **cls.get_commons()
-            
         }
         x = open('mmsp.json',"w").write(json.dumps(data))
         
-
-        return cls.post(f"users/{staffsession.staff.ms_id}/calendar/events",data)
-        
+        return cls.post(f"users/{session.work.organizer.ms_id}/calendar/events",data)
         
 
+    def add_attendee(self, attendee, session, query_set):
 
+        data = {
+            "attendees":self.get_attendees(session, query_set) + {
+                "emailAddress":{
+                    "address":attendee.email,
+                    "name":attendee.dname
+                },
+                "type":"required"
+            }
+        }
+
+        return self.patch(f"users/{self.organizer}/events/{self.event}", data)
+
+    
+    def remove_attendee(self, attendee, session, query_set):
+
+        lst = []
+        for i in self.get_attendees(session, query_set):
+            if i["emailAddress"]["address"] != attendee.email:
+                lst.append(i)
+
+        data = {
+            "attendees":lst
+        }
+
+        return self.patch(f"users/{self.organizer}/events/{self.event}", data)
+    
+
+    def delete(self):
+        return super().delete(f"users/{self.organizer}/events/{self.event}")    
 
 
     
