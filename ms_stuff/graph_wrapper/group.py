@@ -59,7 +59,8 @@ class GroupMS(MSRequest):
             "mailEnabled": False,
             "memberSettings": cls.member_settings,
             "owners@odata.bind": [
-                "https://graph.microsoft.com/v1.0/users/"+constants["STAFFY_ID"]
+                "https://graph.microsoft.com/v1.0/users/"+constants["STAFFY_ID"],
+                "https://graph.microsoft.com/v1.0/users/"+request.data.get("organizer").ms_id
             ]
         }
 
@@ -72,6 +73,9 @@ class GroupMS(MSRequest):
     def get_list(cls):
         cls.get_token()
         return super().get_list("groups")
+
+    def remove_member(self, member:str, user_type:str):
+        return  super().delete(f"groups/{self.group}/{user_type}/{member}/$ref")
 
     def delete(self):
         return super().delete("groups/"+self.group)

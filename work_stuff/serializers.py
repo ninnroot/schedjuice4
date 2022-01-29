@@ -160,9 +160,15 @@ class WorkSerializer(DynamicFieldsModelSerializer):
 
 
     def update(self, instance, data):
-
+        
+        # replacing the organizer
         if data.get("organizer"):
             x = data.get("organizer")
+            if instance.organizer:
+                res = GroupMS(instance.ms_id).remove_member(instance.organizer.ms_id,"owners")
+                if res.status_code not in range(199,300):
+                    return serializers.ValidationError({"MS_error":res.json(),"step":"removing old organizer"})
+
             res = UserMS(x).add_to_group(x.ms_id,instance.ms_id,"owners")
             if res.status_code not in range(199,300):
                 return serializers.ValidationError({"MS_error":res.json(),"step":"adding organizer"})

@@ -1,5 +1,4 @@
 from datetime import date, time
-from http.client import BAD_REQUEST
 from django.db import models
 from django.core.validators import RegexValidator
 
@@ -80,12 +79,8 @@ class Work(CustomModel):
     
     def delete(self, *args, **kwargs):
         
-        # deleting MS team
-        silent = False
-        if "silent" in kwargs:
-            silent = kwargs.pop("silent")
-
-        if not silent:
+ 
+        if not kwargs.pop("silent"):
             
             # "r" should be in kwargs. It's called privately anyway.
             r = kwargs.pop("r")
@@ -102,6 +97,7 @@ class Work(CustomModel):
         verbose_name = "work"
         verbose_name_plural = "works"
         ordering = ["-id"]
+
 
 
 class Session(CustomModel):
@@ -138,6 +134,7 @@ class Session(CustomModel):
         
 
     def delete(self, *args, **kwargs):
+
         if not kwargs.pop("silent"):
             res = EventMS(self.event_id,self.work.organizer.email).delete()
             if res.status_code not in range(199,300):
@@ -173,6 +170,16 @@ class StaffWork(CustomModel):
         verbose_name_plural = "staffwork relations"
         ordering = ["-id"]
 
+    def delete(self, *args, **kwargs):
+        print("phin ma yer nae")
+        if not kwargs.pop("silent"):
+            res = GroupMS(self.work.ms_id).remove_member(self.staff.ms_id,"owners")
+            print(res)
+            if res.status_code not in range(199,300):
+                raise MSException(res.json())
+
+        return super().delete(*args, **kwargs)
+
 
 class StaffSession(CustomModel):
 
@@ -190,12 +197,12 @@ class StaffSession(CustomModel):
     }
 
     def delete(self, *args, **kwargs):
-        
-        res = EventMS(
+        if not kwargs.pop("silent"):
+            res = EventMS(
             self.session.event_id, self.session.work.orgaizer.email
-        ).remove_attendee(self.staff,self.objects.filter(session=self.session).all())
-        if res.status_code not in range(199,300):
-            raise MSException(res.json())
+                    ).remove_attendee(self.staff,self.objects.filter(session=self.session).all())
+            if res.status_code not in range(199,300):
+                raise MSException(res.json())
 
         return super().delete(*args, **kwargs)
 

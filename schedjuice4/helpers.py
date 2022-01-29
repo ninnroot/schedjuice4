@@ -88,11 +88,14 @@ def put_helper(self,request:Request, obj_id):
 def delete_helper(self,request:Request, obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
     seri = self.serializer(obj,context={"r":request}).data
+
     try:
         silent = request.query_params.get("silent")
         if silent is None:
             silent = False
+ 
         obj.delete(r=request,silent=silent)
+     
         return Response(seri, status=status.HTTP_200_OK)
     
     except MSException as e:

@@ -107,7 +107,6 @@ class Staff(AbstractBaseUser, PermissionsMixin):
 
 
     def delete(self, *args, **kwargs):
-        
         # deleting MS account
         try:
             silent = kwargs.pop("silent")
