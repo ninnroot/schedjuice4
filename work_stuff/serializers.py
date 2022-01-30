@@ -9,7 +9,7 @@ from role_stuff.serializers import RoleOnlySerializer
 from ms_stuff.graph_wrapper.group import GroupMS
 from ms_stuff.graph_wrapper.user import UserMS
 
-from .free_time_calc import is_free
+from .free_time_calc import is_free, is_session_collide
 
 
 class CategoryOnlySerializer(DynamicFieldsModelSerializer):
@@ -33,6 +33,14 @@ class WorkOnlySerializer(DynamicFieldsModelSerializer):
 class SessionSerializer(DynamicFieldsModelSerializer):
     
 
+    def validate(self, attrs):
+        x = super().validate(attrs)
+
+        if not is_session_collide(attrs.get("time_to"),attrs.get("work")):
+            raise serializers.ValidationError("Session is colliding with another session of this work.")
+
+        return x
+
     class Meta:
         model = Session
         fields = "__all__"
@@ -49,7 +57,6 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
     def validate(self, data):
         s = data.get("staff")
         se = data.get("session")
-        print(s)
         obj = StaffSession.objects.filter(staff=s,session=se).first()
         if obj:
             raise serializers.ValidationError("Instance already exists.")
@@ -58,7 +65,9 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
         if not obj:
             raise serializers.ValidationError("Staff is not related to Session's Work.")
 
-        #if is_free(s,se)
+        if not is_free(s,se):
+            raise serializers.ValidationError("The staff is not free")
+
         return data
 
 

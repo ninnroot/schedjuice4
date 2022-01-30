@@ -36,9 +36,9 @@ def readonly_determiner(self, request, view, role):
 def owner_determiner(model, user,obj):
 
     dic = {
-        "Staff":lambda x:user.id==obj.id,
-        "Work":lambda x:StaffWork.objects.filter(work=obj.id,staff=user.id).exists(),
-        "Session":lambda x:StaffSession.objects.filter(session=obj.id,staff=user.id).exists()
+        "Staff":lambda :user.id==obj.id,
+        "Work":lambda :StaffWork.objects.filter(work=obj.id,staff=user.id).exists(),
+        "Session":lambda :StaffSession.objects.filter(session=obj.id,staff=user.id).exists()
     }
 
     try:
