@@ -132,6 +132,7 @@ class Tag(CustomModel):
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField(default="Description...")
     color = models.CharField(max_length=7, default="#000000")
+    deletable = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
