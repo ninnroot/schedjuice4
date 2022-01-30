@@ -191,6 +191,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         instance = super().update(instance,data)
         instance.save()
 
+
         return instance
 
 

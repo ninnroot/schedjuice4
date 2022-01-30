@@ -43,8 +43,8 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     ename = models.CharField(max_length=128, default="Nickname")
     uname = models.SlugField(max_length=128, unique=True, validators=[RegexValidator(r"^[a-zA-Z0-9_]*$")])
     description = models.TextField(default="Description...")
-    # statues = ["in progress:0-3", "unapproved","active","retired","on leave"]
-    status = models.CharField(max_length=128, default="unapproved")
+    # statues = ["in progress", "unapproved","active","retired","on leave"]
+    status = models.CharField(max_length=128, default="in progress")
     dob = models.DateField(default=date(2000,1,1))
     gender = models.CharField(max_length=16,default="")
     ph_num = models.CharField(max_length=60,default="09650222", validators=[RegexValidator(r'^\d{1,11}$')])

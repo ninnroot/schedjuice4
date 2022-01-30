@@ -8,8 +8,8 @@ from role_stuff.serializers import RoleOnlySerializer
              
 from ms_stuff.graph_wrapper.group import GroupMS
 from ms_stuff.graph_wrapper.user import UserMS
-from ms_stuff.graph_wrapper.outlook import EventMS
 
+from .free_time_calc import is_free
 
 
 class CategoryOnlySerializer(DynamicFieldsModelSerializer):
@@ -39,6 +39,7 @@ class SessionSerializer(DynamicFieldsModelSerializer):
 
 
 
+
 class StaffSessionSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff", fields="id,email,dname,ename,uname,profile_pic,card_pic",read_only=True)
     session_details = SessionSerializer(source="session",fields="id,work,day,time_from,time_to", read_only=True)
@@ -48,7 +49,7 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
     def validate(self, data):
         s = data.get("staff")
         se = data.get("session")
-        
+        print(s)
         obj = StaffSession.objects.filter(staff=s,session=se).first()
         if obj:
             raise serializers.ValidationError("Instance already exists.")
@@ -56,6 +57,8 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
         obj = StaffWork.objects.filter(staff=s, work=se.work).first()
         if not obj:
             raise serializers.ValidationError("Staff is not related to Session's Work.")
+
+        #if is_free(s,se)
         return data
 
 

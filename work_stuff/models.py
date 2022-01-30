@@ -99,14 +99,12 @@ class Work(CustomModel):
         ordering = ["-id"]
 
 
-
 class Session(CustomModel):
 
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     day = models.CharField(max_length=1)
     time_from = models.TimeField(default=(time(16,0,0)))
     time_to = models.TimeField(default=time(18,0,0))
-    event_id = models.CharField(unique=True, max_length=256)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -132,16 +130,6 @@ class Session(CustomModel):
     def __str__(self):
         return f"{self.work.name} ({self.day})"
         
-
-    def delete(self, *args, **kwargs):
-
-        if not kwargs.pop("silent"):
-            res = EventMS(self.event_id,self.work.organizer.email).delete()
-            if res.status_code not in range(199,300):
-                raise MSException(res.json())  
-
-        return super().delete(*args, **kwargs)
-
 
     class Meta:
         verbose_name = "session"
@@ -171,7 +159,6 @@ class StaffWork(CustomModel):
         ordering = ["-id"]
 
     def delete(self, *args, **kwargs):
-        print("phin ma yer nae")
         if not kwargs.pop("silent"):
             res = GroupMS(self.work.ms_id).remove_member(self.staff.ms_id,"owners")
             print(res)
@@ -195,16 +182,6 @@ class StaffSession(CustomModel):
         "ADM":["created_at","updated_at"],
         "USR":["staff","session","role","created_at","updated_at"]
     }
-
-    def delete(self, *args, **kwargs):
-        if not kwargs.pop("silent"):
-            res = EventMS(
-            self.session.event_id, self.session.work.orgaizer.email
-                    ).remove_attendee(self.staff,self.objects.filter(session=self.session).all())
-            if res.status_code not in range(199,300):
-                raise MSException(res.json())
-
-        return super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = "staffsession relation"

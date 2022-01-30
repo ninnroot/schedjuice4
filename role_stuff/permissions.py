@@ -21,10 +21,14 @@ def readonly_determiner(self, request, view, role):
 
         self.message = f"You do not have permission to update these fields: {rf}"
 
-        if "status" in rf or "role" in rf:
-
-            self.message = "You think you are so clever, huh?"
-        return False
+        if "status" in rf:
+            if request.data.get("status") not in ["unapproved","in progress"]:
+                self.message = "USR can't update status to "+request.data.get("status")
+                return False
+        
+        if "role" in rf:
+            self.message = "You cannot update role"
+            return False
 
     return True
 
@@ -32,15 +36,15 @@ def readonly_determiner(self, request, view, role):
 def owner_determiner(model, user,obj):
 
     dic = {
-        "Staff":user.id==obj.id,
-        "Work":StaffWork.objects.filter(work=obj.id,staff=user.id).exists(),
-        "Session":StaffSession.objects.filter(session=obj.id,staff=user.id).exists()
+        "Staff":lambda x:user.id==obj.id,
+        "Work":lambda x:StaffWork.objects.filter(work=obj.id,staff=user.id).exists(),
+        "Session":lambda x:StaffSession.objects.filter(session=obj.id,staff=user.id).exists()
     }
 
     try:
 
         x =dic[model]
-        return x
+        return x()
 
     except KeyError:
 
