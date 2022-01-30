@@ -38,6 +38,7 @@ class Department(CustomModel):
 class Staff(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(unique=True)
+    gmail = models.EmailField(unique=True,null=True)
     ms_id = models.CharField(max_length=256, unique=True)
     dname = models.CharField(max_length=128, default="Display Name")
     ename = models.CharField(max_length=128, default="Nickname")

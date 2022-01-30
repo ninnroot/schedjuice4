@@ -14,7 +14,8 @@ class Student(CustomModel):
 
     email =  models.EmailField(unique=True)
     ms_id = models.CharField(max_length=256, unique=True)
-    
+    gmail = models.EmailField(unique=True,null=True)
+
     password = models.CharField(max_length=256)
     dname = models.CharField(max_length=128, default="Display Name")
     ename = models.CharField(max_length=128, default="Nickname")
