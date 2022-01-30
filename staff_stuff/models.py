@@ -12,6 +12,9 @@ from ms_stuff.graph_wrapper.user import UserMS
 from ms_stuff.exceptions import MSException
 
 from schedjuice4.models import CustomModel
+from rest_framework.serializers import ValidationError
+
+
 
 class Department(CustomModel):
 
@@ -144,7 +147,11 @@ class Tag(CustomModel):
             "updated_at",
         ],
     }
+    def delete(self,*args,**kwargs):
+        if self.deletable:
+            raise ValidationError("This is a system tag and cannot be deleted.")
 
+        return super().delete(*args,**kwargs)
     
     class Meta:
         verbose_name = 'tag'

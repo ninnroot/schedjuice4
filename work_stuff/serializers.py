@@ -107,7 +107,7 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
 
 
 class CategorySerializer(DynamicFieldsModelSerializer):
-    works = WorkOnlySerializer(read_only=True,many=True)
+    works = WorkOnlySerializer(source="work_set",read_only=True,many=True)
 
     class Meta:
         model = Category

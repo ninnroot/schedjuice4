@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from .filter import get_filter_query
 
 from ms_stuff.exceptions import MSException
-
+from rest_framework.serializers import ValidationError
 
 
 def getlist_helper(self,request:Request):
@@ -99,8 +99,9 @@ def delete_helper(self,request:Request, obj_id):
      
         return Response(seri, status=status.HTTP_200_OK)
     
-    except MSException as e:
-        return Response(e.detail, status=status.HTTP_404_NOT_FOUND)
+
+    except MSException or ValidationError as e:
+        return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
 
     
 
