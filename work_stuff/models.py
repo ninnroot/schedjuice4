@@ -46,8 +46,9 @@ class Work(CustomModel):
 
     valid_from = models.DateField(default=date(2000,1,1))
     valid_to = models.DateField(default=date(2000,12,1))
+    
     # statuses = ["pending", "ready" ,"active", "ended", "on halt"]
-    status = models.CharField(max_length=32, default="active")
+    status = models.CharField(max_length=32, default="pending")
     predecessor = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     cover_pic = models.ImageField(default="work_covers/default.jpg", upload_to="work_covers")
     category = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True)

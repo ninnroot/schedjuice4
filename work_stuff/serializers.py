@@ -35,8 +35,11 @@ class SessionSerializer(DynamicFieldsModelSerializer):
 
     def validate(self, attrs):
         x = super().validate(attrs)
+        if attrs.get("time_from") == attrs.get("time_to"):
+            if attrs.get("time_from") is not None:
+                raise serializers.ValidationError("time_from and time_to cannot be the same")
 
-        if not is_session_collide(attrs.get("time_to"),attrs.get("work")):
+        if is_session_collide(attrs.get("time_from"),attrs.get("time_to"),attrs.get("work")):
             raise serializers.ValidationError("Session is colliding with another session of this work.")
 
         return x
