@@ -5,7 +5,6 @@ from staff_stuff.models import Staff
 
 def is_free(staff:Staff,session:Session):
 
-    # check if works overlap
     works = StaffWork.objects.filter(staff=staff).all()
 
     for i in works:
