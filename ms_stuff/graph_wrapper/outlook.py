@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 
 from .base import MSRequest
@@ -46,11 +46,12 @@ class EventMS(MSRequest):
         x = datetime(a.year,a.month,a.day,x.hour,x.minute,x.second)
         y = datetime(a.year,a.month,a.day,y.hour,y.minute,y.second)
         
-        tz = timezone.activate("Asia/Rangoon")
-        time_from = (x.astimezone(tz))
-        time_to = (y.astimezone(tz))
+        td = timedelta(minutes=90)
+    
+        time_from = (x+td).time()
+        time_to = (y+td).time()
 
-
+        
         return {
             "start":{
                 "dateTime":time_from.isoformat(),
@@ -125,21 +126,53 @@ class EventMS(MSRequest):
             # common properties
             **cls.get_commons()
         }
-        x = open('mmsp.json',"w").write(json.dumps(data))
         
         return cls.post(f"users/{session.work.organizer.ms_id}/calendar/events",data)
-        
+    
 
-    def add_attendee(self, attendee, session, query_set):
+    def update_time(self, session, data):
+
+        x = data.get("time_from")
+        y = data.get("time_to")
+        if x is None:
+            x = session.time_from
+        if y is None:
+            y = session.time_to
+
+        a = session.work.valid_from
+        x = datetime(a.year,a.month,a.day,x.hour,x.minute,x.second)
+        y = datetime(a.year,a.month,a.day,y.hour,y.minute,y.second)
+        
+        td = timedelta(minutes=90)
+    
+        time_from = (x+td).time()
+        time_to = (y+td).time()
+
+
+        post_data =  {
+            "start":{
+                "dateTime":time_from.isoformat(),
+                "timeZone":self.api_timezone
+                },
+            "end":{
+                "dateTime":time_to.isoformat(),
+                "timeZone":self.api_timezone
+                }
+            }
+
+        return self.patch(f"users/{self.organizer}/events/{self.event}",post_data)
+
+
+    def add_attendee(self, attendee, query_set):
 
         data = {
-            "attendees":self.get_attendees(session, query_set) + {
+            "attendees":self.get_attendees(query_set) + [{
                 "emailAddress":{
                     "address":attendee.email,
                     "name":attendee.dname
                 },
                 "type":"required"
-            }
+            }]
         }
 
         return self.patch(f"users/{self.organizer}/events/{self.event}", data)

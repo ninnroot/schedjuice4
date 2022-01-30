@@ -1,3 +1,4 @@
+from ms_stuff.graph_wrapper.config import constants
 from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from rest_framework import serializers
 
@@ -31,24 +32,11 @@ class WorkOnlySerializer(DynamicFieldsModelSerializer):
 
 class SessionSerializer(DynamicFieldsModelSerializer):
     
-    def create(self, data):
-
-        x = Session.objects.create(**data)
-        
-        res = EventMS.create_event_for_session(x)
-        if res.status_code not in range(199,300):
-            raise serializers.ValidationError({"MS_error":res.json})
-
-        x.event_id = res["id"]
-        x.save()
-        return x
 
     class Meta:
         model = Session
         fields = "__all__"
-        extra_kwargs = {
-            "event_id":{"required":False}
-        }
+
 
 
 class StaffSessionSerializer(DynamicFieldsModelSerializer):
@@ -61,26 +49,14 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
         s = data.get("staff")
         se = data.get("session")
         
-        obj = StaffSession.objects.filter(staff=s,session=se).exists()
-        if not obj:
+        obj = StaffSession.objects.filter(staff=s,session=se).first()
+        if obj:
             raise serializers.ValidationError("Instance already exists.")
         
-        obj = StaffWork.objects.filter(staff=s, work=se.work).exists()
+        obj = StaffWork.objects.filter(staff=s, work=se.work).first()
         if not obj:
             raise serializers.ValidationError("Staff is not related to Session's Work.")
         return data
-
-
-    def create(self, data):
-        se = data.get("session")
-        e = EventMS(se.event_id,se.work.organizer.email)
-        res = e.add_attendee(data.get("staff"),StaffSession.objects.filter(session=se).all())
-
-        if res.status_code not in range(199,300):
-            raise serializers.ValidationError({"MS_error":res.json()})
-        
-        
-        return super().create(data)
 
 
     class Meta:
@@ -147,42 +123,32 @@ class WorkSerializer(DynamicFieldsModelSerializer):
 
     
     def create(self, data):
-        r = self.context.get("r")
-        res = GroupMS.create_group(r)
+        res = GroupMS.create_group(data)
         
         if res.status_code not in range(199,300):
-            raise serializers.ValidationError({"MS_error":res.json()})
+            raise serializers.ValidationError({"MS_error":res.json(), "step":"creating group"})
         
         # get the group id from Graph API which is in the headers.
         # save that together with the crated Work.
         gp_id = res.headers["Content-Location"].split("'")[1::2][0]
         data["ms_id"] = gp_id
 
-
-    def update(self, instance, data):
+        gp = GroupMS(gp_id)
+        res = gp.create_channel("Announcement")
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json(), "step":"creating channel"})
         
-        # replacing the organizer
-        if data.get("organizer"):
-            x = data.get("organizer")
-            if instance.organizer:
-                res = GroupMS(instance.ms_id).remove_member(instance.organizer.ms_id,"owners")
-                if res.status_code not in range(199,300):
-                    return serializers.ValidationError({"MS_error":res.json(),"step":"removing old organizer"})
+        data["channel_id"] = res.json()["id"]
 
-            res = UserMS(x).add_to_group(x.ms_id,instance.ms_id,"owners")
-            if res.status_code not in range(199,300):
-                return serializers.ValidationError({"MS_error":res.json(),"step":"adding organizer"})
-            
-            instance = super().update(instance,data)
-
-            return instance
+        return super().create(data)
 
 
     class Meta:
         model = Work
         fields = "__all__"
         extra_kwargs = {
-            "ms_id":{"required":False}
+            "ms_id":{"required":False, "read_only":True},
+            "channel_id":{"required":False, "read_only":True}
         }
 
 

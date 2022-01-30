@@ -34,37 +34,37 @@ class GroupMS(MSRequest):
         }
 
     @classmethod
-    def create_group(cls, request=None, group_type="educationClass", name=None):
+    def create_group(cls, data=None, group_type="educationClass", name=None):
 
         cls.get_token()
         # see available types of groups here:
         # https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates
 
-        if request:
-            name = request.data.get("name")
+        if data:
+            name = data.get("name")
         name = name
 
         if name is None:
             raise ValidationError(
                 "A Request object must be provided else name kwarg must be specified. Both can't be none.")
 
-        data = {
+        post_data = {
             "template@odata.bind": f"https://graph.microsoft.com/v1.0/teamsTemplates('{group_type}')",
             "displayName": name,
             "description": f"Hello, welcome to {name}. Created by Schedjuice4 at {timezone.now()}",
             "channels": [
-                GroupMS.make_channel("Announcements"),
+                
                 GroupMS.make_channel("General")
             ],
             "mailEnabled": False,
             "memberSettings": cls.member_settings,
             "owners@odata.bind": [
-                "https://graph.microsoft.com/v1.0/users/"+constants["STAFFY_ID"],
-                "https://graph.microsoft.com/v1.0/users/"+request.data.get("organizer").ms_id
-            ]
-        }
+                "https://graph.microsoft.com/v1.0/users/"+constants["STAFFY_ID"]
+            ],
+            
+            }
 
-        return requests.post(constants["BETA_URL"]+"teams", json.dumps(data), headers=cls.headers)
+        return requests.post(constants["BETA_URL"]+"teams", json.dumps(post_data), headers=cls.headers)
 
     def get(self):
         return super().get("groups/"+self.group)
@@ -73,6 +73,11 @@ class GroupMS(MSRequest):
     def get_list(cls):
         cls.get_token()
         return super().get_list("groups")
+
+    def create_channel(self,display_name:str):
+        c = self.make_channel(display_name)
+
+        return self.post(f"teams/{self.group}/channels",c)
 
     def remove_member(self, member:str, user_type:str):
         return  super().delete(f"groups/{self.group}/{user_type}/{member}/$ref")

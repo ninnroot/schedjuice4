@@ -41,8 +41,8 @@ class Work(CustomModel):
 
     name = models.CharField(max_length=256,unique=True)
     ms_id = models.CharField(max_length=256, unique=True)
+    channel_id = models.CharField(max_length=256)
     description = models.TextField(default="Description...")
-    organizer = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True)
 
     valid_from = models.DateField(default=date(2000,1,1))
     valid_to = models.DateField(default=date(2000,12,1))
@@ -130,7 +130,7 @@ class Session(CustomModel):
 
 
     def __str__(self):
-        return f"{self.work}:{self.day}:{self.time_from}-{self.time_to}"
+        return f"{self.work.name} ({self.day})"
         
 
     def delete(self, *args, **kwargs):
