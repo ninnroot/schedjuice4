@@ -81,6 +81,7 @@ def put_helper(self,request:Request, obj_id):
     if seri.is_valid():
         seri.save()
 
+
         return Response(seri.data, status=status.HTTP_200_OK)
     return Response(seri.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -31,9 +31,9 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             for i in read_only_fields:
                 try:
                     self.fields[i].read_only=True
-                except KeyError:
+                except KeyError as e:
                     pass
-
+        
         if excluded_fields is not None:
             try:
                 for i in excluded_fields:

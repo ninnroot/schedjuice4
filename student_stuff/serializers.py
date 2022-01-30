@@ -20,7 +20,7 @@ class StudentOnlySerializer(DynamicFieldsModelSerializer):
 
 class StudentWorkSerializer(DynamicFieldsModelSerializer):
     student_details = StudentOnlySerializer(source="student", fields="id,email,dname,ename,profile_pic,card_pic",read_only=True)
-    work_details = WorkOnlySerializer(source="work",fields="id,name", read_only=True)
+    work_details = WorkOnlySerializer(source="work",fields="id,name,status", read_only=True)
 
 
     def create(self, data):

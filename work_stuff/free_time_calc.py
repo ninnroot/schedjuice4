@@ -32,25 +32,39 @@ def is_session_collide(time_to, work:Work):
     return True
 
 
-def get_schedule(staff:Staff,start=date.today(),end=date.today()+timedelta(days=7)):
+def get_schedule(staff:Staff,start=None,end=None):
     
+    if not start:
+        start = date.today()
+    if not end:
+        end = start+timedelta(days=7)
+
     x = StaffSession.objects.filter(staff=staff).prefetch_related("session","staff")
 
     schedule = {}
 
     while start < end:
-        
-        
         y = []
         for i in x:
-            if i.session.work.valid_from > start and i.work.valid_from < end and x.session.day == start.weekday():
-                z = {i.id:(i.session.time_from,i.session.time_to)}
-                y.append(z)
-        schedule[start.weekday()] = y
+
+            if i.session.day == str(start.weekday()):
+
+                if i.session.work.valid_from > start and i.session.work.valid_from < end:
+                    
+                    z = {i.id:{
+                        "time_from":i.session.time_from,
+                        "time_to":i.session.time_to,
+                        "date":start.isoformat()
+                        }}
+                    y.append(z)
+        if not start.weekday() in schedule:
+            schedule[start.weekday()] = y
+        else:
+            schedule[start.weekday()]+=y
 
         start += timedelta(days=1)
 
-    return schedule
+    return {"schedule":schedule}
 
 
 

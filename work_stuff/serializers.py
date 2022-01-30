@@ -79,7 +79,7 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
 
 class StaffWorkSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,uname,profile_pic,card_pic", read_only=True)
-    work_details = WorkOnlySerializer(source="work", fields="id,name", read_only=True)
+    work_details = WorkOnlySerializer(source="work", fields="id,name,status", read_only=True)
     role_details = RoleOnlySerializer(source="role", fields="id,name,shorthand,is_specific", read_only=True)
 
     def validate(self, data):
@@ -118,7 +118,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
 class WorkSerializer(DynamicFieldsModelSerializer):
     staff = StaffWorkSerializer(source="staffwork_set",fields="id,staff_details,role_details" , many=True, read_only=True)
     sessions = SessionSerializer(source="session_set", many=True, read_only=True)
-    category = CategoryOnlySerializer(read_only=True)
+    category_details = CategoryOnlySerializer(source="category",fields="id,name", read_only=True)
     _status_lst = [
         "pending",
         "ready",
@@ -132,6 +132,7 @@ class WorkSerializer(DynamicFieldsModelSerializer):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
 
         return super().validate(data) 
+
 
     
     def create(self, data):
