@@ -47,7 +47,7 @@ class WorkOnlySerializer(DynamicFieldsModelSerializer):
 
 class StaffSessionOnlySerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff",fields="id,dname,ename,email,uname,profile_pic,card_pic", read_only=True)
-    role_details = RoleOnlySerializer(source="role",fields="id,name,shorthand",read_only=True)
+    role_details = RoleOnlySerializer(source="role",field="id,name,shorthand",read_only=True)
 
     class Meta:
         model = StaffSession
@@ -55,7 +55,7 @@ class StaffSessionOnlySerializer(DynamicFieldsModelSerializer):
 
 class SessionSerializer(DynamicFieldsModelSerializer):
     
-    staffsessions = StaffSessionOnlySerializer(source="staffsession_set",fields="id,staff_details",many=True, read_only=True)
+    staffsessions = StaffSessionOnlySerializer(source="staffsession_set",fields="id,staff_details,role_details",many=True, read_only=True)
 
     def validate(self, attrs):
         x = super().validate(attrs)
