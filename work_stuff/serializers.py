@@ -8,9 +8,16 @@ from role_stuff.serializers import RoleOnlySerializer
              
 from ms_stuff.graph_wrapper.group import GroupMS
 from ms_stuff.graph_wrapper.user import UserMS
+from student_stuff.models import Student
 
 from .free_time_calc import is_free, is_session_collide
 
+
+class StudentOnlySerializer(DynamicFieldsModelSerializer):
+    
+    class Meta:
+        model = Student
+        fields = "__all__"
 
 class CategoryOnlySerializer(DynamicFieldsModelSerializer):
     
@@ -121,6 +128,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
 class WorkSerializer(DynamicFieldsModelSerializer):
     staff = StaffWorkSerializer(source="staffwork_set",fields="id,staff_details,role_details" , many=True, read_only=True)
     sessions = SessionSerializer(source="session_set", many=True, read_only=True)
+    students = StudentOnlySerializer(source="student_set",many=True, read_only=True)
     category_details = CategoryOnlySerializer(source="category",fields="id,name", read_only=True)
     _status_lst = [
         "pending",
