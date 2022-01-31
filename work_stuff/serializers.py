@@ -47,6 +47,7 @@ class WorkOnlySerializer(DynamicFieldsModelSerializer):
 
 class StaffSessionOnlySerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff",fields="id,dname,ename,email,uname,profile_pic,card_pic", read_only=True)
+    role_details = RoleOnlySerializer(source="role",fields="id,name,shorthand",read_only=True)
 
     class Meta:
         model = StaffSession
