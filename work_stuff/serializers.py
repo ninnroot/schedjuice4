@@ -73,8 +73,6 @@ class SessionSerializer(DynamicFieldsModelSerializer):
         fields = "__all__"
 
 
-
-
 class StaffSessionSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff", fields="id,email,dname,ename,uname,profile_pic,card_pic",read_only=True)
     session_details = SessionSerializer(source="session",fields="id,work,day,time_from,time_to", read_only=True)
@@ -82,6 +80,9 @@ class StaffSessionSerializer(DynamicFieldsModelSerializer):
 
 
     def validate(self, data): 
+        if not data.get('role').is_specific:
+            raise serializers.ValidationError("Cannot assign non-specific role to StaffSession.")
+
         s = data.get("staff")
         se = data.get("session")
         obj = StaffSession.objects.filter(staff=s,session=se).first()
@@ -110,6 +111,9 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
     role_details = RoleOnlySerializer(source="role", fields="id,name,shorthand,is_specific", read_only=True)
 
     def validate(self, data):
+        if not data.get('role').is_specific:
+            raise serializers.ValidationError("Cannot assign non-specific role to StaffWork.")
+
         s = data.get("staff")
         w = data.get("work")
         obj = StaffWork.objects.filter(staff=s,work=w).first()
@@ -150,7 +154,6 @@ class WorkSerializer(DynamicFieldsModelSerializer):
     _status_lst = [
         "pending",
         "ready",
-        "active",
         "ended",
         "on halt"
     ]

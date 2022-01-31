@@ -66,7 +66,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     cover_pic = models.ImageField(default="cover_pics/default.jpg", upload_to="cover_pics")
     card_pic = models.ImageField(default="card_pics/default.jpg", upload_to="card_pics")
     first_day = models.DateField(default=date(2018,1,1))
-    role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL)
+    role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL, default=3)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -148,7 +148,7 @@ class Tag(CustomModel):
         ],
     }
     def delete(self,*args,**kwargs):
-        if self.deletable:
+        if not self.deletable:
             raise ValidationError("This is a system tag and cannot be deleted.")
 
         return super().delete(*args,**kwargs)

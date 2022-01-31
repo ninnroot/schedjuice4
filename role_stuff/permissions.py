@@ -123,6 +123,7 @@ class IsSDMOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         return True
 
+
 class IsADMOrReadOnly(BasePermission):
     message = "You do not have permission to perform this action. At least the ADM role is required."
 

@@ -89,6 +89,7 @@ class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
         model = StaffDepartment
         fields = "__all__"
 
+
 class StaffTagSerializer(DynamicFieldsModelSerializer):    
     staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,uname,profile_pic,card_pic", read_only=True)
     tag_details = TagOnlySerializer(source="tag",fields="id,name,color", read_only=True)
@@ -159,6 +160,13 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         ]
 
     def validate(self, data):
+        role = Staff.objects.get(pk=(self.context.get("r").user.id)).role.shorthand
+        if data.get("role").is_specific:
+            raise serializers.ValidationError("Cannot assigned a specific role to Staff.")
+        
+        if role == "ADM":
+            if data.get("role").shorthand in ["SDM", "ADM"]:
+                raise serializers.ValidationError("ADM can only give USR role.")
 
         status = data.get("status")
         if not status_check(status, self._status_lst):

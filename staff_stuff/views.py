@@ -30,7 +30,7 @@ class StaffDetails(GeneralDetails):
     
     model = Staff
     serializer = StaffSerializer
-    permission_classes = [IsAuthenticated, StatusCheck,IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
 
 
 class DepartmentList(GeneralList):
