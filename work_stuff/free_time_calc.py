@@ -15,6 +15,7 @@ def is_free(staff:Staff,session:Session):
     works = StaffWork.objects.filter(staff=staff).all()
 
     for i in works:
+        
         if  ftse(i.work.valid_from, i.work.valid_to, session.work.valid_from, session.work.valid_to):
             sessions = Session.objects.filter(work=i.work).all().prefetch_related("work")
             
@@ -28,11 +29,12 @@ def is_free(staff:Staff,session:Session):
 
 def is_session_collide(time_from,time_to, work:Work):
     
-    sessions = Session.objects.filter(work=work)
+    sessions = Session.objects.filter(work=work).all().prefetch_related("work")
 
     for i in sessions:
-        if ftse(time_from,time_to,i.time_from,i.time_to):
-            return False
+        if i.work.status == "active":
+            if ftse(time_from,time_to,i.time_from,i.time_to):
+                return False
 
     return True
 
@@ -67,7 +69,9 @@ def get_schedule(staff:Staff,start=None,end=None):
                         "time_to":i.session.time_to,
                         "day":start.weekday(),
                         "session":i.session.id,
-                        "staffsession":i.id
+                        "staffsession":i.id,
+                        "work":{"id":i.session.work.id, "name":i.session.work.name},
+                        "status":i.session.work.status
                         }
                     y.append(z)
 

@@ -86,7 +86,7 @@ You can filter what kind of instances you want to receive. You can do this to an
 GET https://api.teachersucenter.com/api/v1/staff?x=Foo&y=Bar
 ```
 
-You can specify pagination. By default, the server returns the first 100 results. You can change this by providing a <code>>size</code> parameter and specify the page number with the <code>page</code> parameter.
+You can specify pagination. By default, the server returns the first 100 results. You can change this by providing a <code>size</code> parameter and specify the page number with the <code>page</code> parameter.
 ```
 GET https://api.teachersucenter.com/api/v1/staff?page=&size=20
 ```
@@ -182,7 +182,37 @@ Here are current list of non-specific roles:
 - Coordinator (cor)
 - Academic director (adr)
 
-or you can just send a GET request to <code>https://api.teachersucenter.com/api/v1/roles?specific=False</code>
+or you can just send a GET request to <code>https://api.teachersucenter.com/api/v1/roles?is_specific=False</code>
+
+
+## About statuses
+In <code>Work</code> and <code>Staff</code> objects, there's a "status" field. 
+
+### Work statuses
+
+| STATUS | DESCRIPTION |
+| --- | --- |
+| pending | the work is not starting yet. |
+| ready | the work is ready to be started. The status will change to "active" automatically when "valid_from" is reached. |
+| active | the work is active and running. |
+| ended | the work has ended. |
+| on halt | the work is on halt. |
+
+When calculating payroll, only "active" works are considered. The "status" attribute is also used in other things like planning upcoming classes.
+
+
+## Staff statuses
+
+| STATUS | DESCRIPTION |
+| --- | --- |
+| in progress | the staff is in the progress of registering. |
+| unapproved | the staff has finished registered, but is still requires approval from ADMs |
+| active | the staff is active |
+| retired | the staff has resigned or has been dismissed from the center |
+| on leave | the staff is temporarily not working |
+
+The "status" attribute of Staff is used to see currently working staff member, and to selectively approve new accounts. Some endpoints allow only "active" and "on leave" staff members to get access.
+
 
 
 ***
