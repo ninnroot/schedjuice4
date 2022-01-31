@@ -33,6 +33,8 @@ class TagOnlySerializer(DynamicFieldsModelSerializer):
 
 
 
+
+
 class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff", fields="id,dname,ename,uname,profile_pic,email,card_pic",read_only=True)
     department_details = DepartmentOnlySerializer(source="department", fields="id,name", read_only=True)
@@ -208,6 +210,8 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
 class DepartmentSerializer(DynamicFieldsModelSerializer):
     staff = StaffDepartmentSerializer(source="staffdepartment_set",fields="id,pos,staff_details",many=True,read_only=True)
+    department_details = DepartmentOnlySerializer(source="is_under",fields="id,name,shorthand", read_only=True)
+
     class Meta:
         model = Department
         fields = "__all__"
