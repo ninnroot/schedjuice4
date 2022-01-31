@@ -2,13 +2,14 @@ from ms_stuff.graph_wrapper.config import constants
 from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from rest_framework import serializers
 
+
 from .models import Work, StaffWork, Session, StaffSession, Category
 from staff_stuff.models import Staff
 from role_stuff.serializers import RoleOnlySerializer
              
 from ms_stuff.graph_wrapper.group import GroupMS
 from ms_stuff.graph_wrapper.user import UserMS
-from student_stuff.models import Student
+from student_stuff.models import Student, StudentWork
 
 from .free_time_calc import is_free, is_session_collide
 
@@ -17,6 +18,14 @@ class StudentOnlySerializer(DynamicFieldsModelSerializer):
     
     class Meta:
         model = Student
+        fields = "__all__"
+
+
+class StudentWorkSerializer(DynamicFieldsModelSerializer):
+    student_details = StudentOnlySerializer(source="student",fields="id,email,dname,ename", read_only=True)
+
+    class Meta:
+        model = StudentWork
         fields = "__all__"
 
 class CategoryOnlySerializer(DynamicFieldsModelSerializer):
@@ -128,7 +137,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
 class WorkSerializer(DynamicFieldsModelSerializer):
     staff = StaffWorkSerializer(source="staffwork_set",fields="id,staff_details,role_details" , many=True, read_only=True)
     sessions = SessionSerializer(source="session_set", many=True, read_only=True)
-    students = StudentOnlySerializer(source="student_set",many=True, read_only=True)
+    students = StudentWorkSerializer(source="studentwork_set",many=True, fields="id,student_details", read_only=True)
     category_details = CategoryOnlySerializer(source="category",fields="id,name", read_only=True)
     _status_lst = [
         "pending",
