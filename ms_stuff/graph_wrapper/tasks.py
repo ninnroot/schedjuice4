@@ -12,9 +12,9 @@ def raise_error(request,step:str):
     
     return request
 
-def start_user_creation_flow(request, data, pw, user_type:str, mail=True):
+def start_user_creation_flow(request, data, user_type:str, mail=True):
     user = UserMS(request.data.get("email"))
-
+    pw = data.get("password")
     # create MS user
     res = raise_error(user.create_with_req(request,pw),"create")
     
@@ -34,6 +34,11 @@ def start_user_creation_flow(request, data, pw, user_type:str, mail=True):
         context = {"name": data["dname"], "email":data["email"], "password":data["password"]}
         res = MailMS().send_welcome("staffy@teachersucenter.com",data["email"],context)
         res = raise_error(res, "mail sending")
+
+        # if "gmail" in data:
+        #     context = {"name": data["dname"], "email":data["email"], "password":data["password"]}
+        #     res = MailMS().send_welcome("staffy@teachersucenter.com",data["gmail"],context)
+        #     res = raise_error(res, "mail sending")
 
 
     if user_type == "staff":

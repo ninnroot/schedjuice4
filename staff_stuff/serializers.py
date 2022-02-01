@@ -165,9 +165,9 @@ class StaffSerializer(DynamicFieldsModelSerializer):
             if data.get("role").is_specific:
                 raise serializers.ValidationError("Cannot assigned a specific role to Staff.")
         
-        if role == "ADM":
-            if data.get("role").shorthand in ["SDM", "ADM"]:
-                raise serializers.ValidationError("ADM can only give USR role.")
+            if role == "ADM":
+                if data.get("role").shorthand in ["SDM", "ADM"]:
+                    raise serializers.ValidationError("ADM can only give USR role.")
 
         status = data.get("status")
         if not status_check(status, self._status_lst):

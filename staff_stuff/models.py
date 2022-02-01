@@ -124,7 +124,6 @@ class Staff(AbstractBaseUser, PermissionsMixin):
 
             if loud:
 
-                r = kwargs.pop("r")
                 res = UserMS(self.email).delete()
             
                 if res.status_code not in range(199,300):

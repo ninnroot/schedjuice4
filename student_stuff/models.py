@@ -1,4 +1,7 @@
 from operator import mod
+from ms_stuff.graph_wrapper.user import UserMS
+from ms_stuff.exceptions import MSException
+
 from work_stuff.models import Work
 from django.db import models
 from schedjuice4.models import CustomModel
@@ -44,6 +47,15 @@ class Student(CustomModel):
         "ADM":["email","password"],
              
     }  
+
+    def delete(self, *args, **kwargs):
+        if not kwargs.pop("silent",None):
+            res = UserMS(self.email).delete()
+            if res.status_code not in range(199,300):
+                    raise MSException(detail=res.json())
+
+
+        return super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = "student"
