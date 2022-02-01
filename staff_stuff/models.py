@@ -98,6 +98,12 @@ class Staff(AbstractBaseUser, PermissionsMixin):
             "uname",
             "status",
             "role",
+            "house_num",
+            "street",
+            "township",
+            "city",
+            "region",
+            "postal_code",
             "created_at",
             "updated_at",
 

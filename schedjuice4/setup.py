@@ -1,11 +1,28 @@
 import csv
 import requests
 import json
+import random
 
-from ms_stuff.graph_helper import MailMS
+from ms_stuff.graph_wrapper.mail import MailMS
 
-SES = "n0wozpw0sxzwm8y7dcjf2uug33xbuz3x"
+
 AUTH = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQyNzg5OTM0LCJpYXQiOjE2NDI3NzU1MzQsImp0aSI6IjIyN2U3MmY0MzgyYzQ1OTg4YTJiMGM2MjhhYTRkM2QzIiwidXNlcl9pZCI6NDZ9.AZpzwOQTErhsghfVyEOKvLIh2nN35iimFZh3Lpl-QSc"
+
+
+def password_create():
+    a = "abcdefghijklmnopqrsquvwxyz"
+    b = "1234567890"
+    c = "!@#$"
+
+    pw = "ts"
+
+    for i in range(2):
+        pw+=random.choice(a)
+        pw+=random.choice(b)
+        pw+=random.choice(c)
+    pw+=random.choice(a).upper()
+
+    return pw
 
 
 def main():
@@ -18,22 +35,26 @@ def main():
         e=""
 
         cc = 0
-        for j in i[1].split():
-            if cc == 0:
+        for j in i[0].split():
+            if cc == 0 or cc ==1:
                 e+=j.lower()
             else:
                 e+=j[0].lower()
             cc+=1
 
-        e+=str(c%10)
+        e+=str(c%15)
         
+        pw = password_create()
 
-        y = {"gmail":i[2],"name":i[1], "email":e+"@teachersucenter.com"}
+        y = [i[0], i[1], e+"@teachersucenter.com", pw, e]
         lst.append(y)
 
         c+=1
 
-    return lst
+    output = csv.writer(open("readyaccounts.csv","w"))
+    output.writerows(lst)
+
+
 
 def create():
     m = MailMS()
@@ -45,25 +66,13 @@ def create():
             "uname":i["email"].split("@")[0],
             "dname":i["name"]
         }
+
         res = requests.post(
             "http://localhost:8000/api/v1/staff",
             data=data,
-            cookies={"sessionid":SES},
             headers={"Authorization":"Bearer "+AUTH}
             )
-        if res.status_code not in range(199,300):
-            print(res.content)
 
-        s = res.json()["id"]
-        res = add_to_class(14,s)
-        if res.status_code not in range(199,300):
-            print(res.json())
-
-        context = {"name":i["name"], "email":i["email"], "password":"dh#!fFO2f23#"}
-        res = m.send_welcome("staffy@teachersucenter.com",i["gmail"],context=context)
-        if res.status_code not in range(199,300):
-            print(res.json())
-        print(i)
 
 
 def add_to_class(work,staff):
@@ -74,44 +83,7 @@ def add_to_class(work,staff):
     return requests.post(
             "http://localhost:8000/api/v1/studentworks",
             data=data,
-            cookies={"sessionid":SES},
             headers={"Authorization":"Bearer "+AUTH}
             )
 
 
-def create_stu():
-    pw = "hggODG37!@$"
-    for i in main():
-        data = {
-            "email":i["email"],
-            "dname":i["name"]
-        }
-
-        res = requests.post(
-            "http://localhost:8000/api/v1/students",
-            data=data,
-            cookies={"sessionid":SES},
-            headers={"Authorization":"Bearer "+AUTH}
-            )
-        if res.status_code not in range(199,300):
-            print(res.content)
-
-        s = res.json()["id"]
-        res = add_to_class(14,s)
-        if res.status_code not in range(199,300):
-            print(res.content)
-
-        context = {"name":i["name"], "email":i["email"], "password":pw}
-        res = MailMS().send_welcome("staffy@teachersucenter.com",i["gmail"],context=context)
-        res = MailMS().send_welcome("staffy@teachersucenter.com","tinwinnaing6969@gmail.com",context=context)
-        if res.status_code not in range(199,300):
-            print(res.content)
-        print(i)
-
-def mmsp():
-    for i in main():
-        pw = "hggODG37!@$"
-        context = {"name":i["name"], "email":i["email"], "password":pw}
-        res = MailMS().send_welcome("staffy@teachersucenter.com",i["gmail"],context=context)
-        #res = MailMS().send_welcome("staffy@teachersucenter.com","tinwinnaing6969@gmail.com",context=context)
-        print(i, res.status_code)
