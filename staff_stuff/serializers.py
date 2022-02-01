@@ -148,6 +148,12 @@ class StaffSerializer(DynamicFieldsModelSerializer):
     sessions = StaffSessionSerializer(source="staffsession_set",fields="id,session_details", many=True, read_only=True)
     role_details = RoleOnlySerializer(source="role",read_only=True)
     
+    _gender_lst = [
+        "male",
+        "female",
+        "non-binary",
+        "other"
+    ]
     _status_lst = [
             "in progress:0",
             "in progress:1",
@@ -172,6 +178,10 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         status = data.get("status")
         if not status_check(status, self._status_lst):
             raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
+
+        if data.get("gender"):
+            if data.get("gender") not in self._gender_lst:
+                raise serializers.ValidationError({"gender":"Gender must be in "+ self._gender_lst})
 
         return super().validate(data)
 

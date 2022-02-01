@@ -171,10 +171,16 @@ def create_students(class_id, initial=True):
                 )
 
             print("LOG: ",c,res.content)
+            print("\n")
+            if res.status_code in range(199,300):
+                add = add_to_class(class_id,res.json()["id"],token)
+                print("CLASS: ",add.content)
+
             m.send_welcome("staffy@teachersucenter.com","tinwinnaing6969@gmail.com",
             {"name":i[0],"email":i[2],"password":i[3]})
 
             c+=1
+            print("===========")
 
 
 def delete_students():
