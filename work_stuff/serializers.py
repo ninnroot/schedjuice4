@@ -59,14 +59,14 @@ class SessionSerializer(DynamicFieldsModelSerializer):
 
     def validate(self, attrs):
         x = super().validate(attrs)
-        if attrs.get("time_from") <= attrs.get("time_to"):
-            if attrs.get("time_from") is not None:
-                raise serializers.ValidationError("time_from must be greater than time_to")
+        if attrs.get("time_from") and attrs.get("time_to"):
+            if attrs.get("time_from") >= attrs.get("time_to"):
+                raise serializers.ValidationError("time_to must be greater than time_from")
 
-        if is_session_collide(attrs.get("time_from"),attrs.get("time_to"),attrs.get("work")):
-            raise serializers.ValidationError("Session is colliding with another session of this work.")
+            if is_session_collide(attrs.get("time_from"),attrs.get("time_to"),attrs.get("work")):
+                raise serializers.ValidationError("Session is colliding with another session of this work.")
 
-        return x
+            return x
 
     class Meta:
         model = Session
@@ -153,20 +153,21 @@ class WorkSerializer(DynamicFieldsModelSerializer):
     category_details = CategoryOnlySerializer(source="category",fields="id,name", read_only=True)
     _status_lst = [
         "pending",
+        "active",
         "ready",
         "ended",
         "on halt"
     ]
     def validate(self, data):
-        
-        if data.get("valid_from") >= data.get("valid_to"):
-            raise serializers.ValidationError("valid_from must be less than valid_to.")
+        if data.get("valid_from") and data.get("valid_to"):
+            if data.get("valid_from") >= data.get("valid_to"):
+                raise serializers.ValidationError("valid_from must be less than valid_to.")
 
-        status = data.get("status")
-        if not status_check(status, self._status_lst):
-            raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
+            status = data.get("status")
+            if not status_check(status, self._status_lst):
+                raise serializers.ValidationError({"status":f"Status '{status}' not allowed. Allowed statuses are {self._status_lst}."})
 
-        return super().validate(data) 
+            return super().validate(data) 
 
 
     

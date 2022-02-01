@@ -6,9 +6,11 @@ import random
 from ms_stuff.graph_wrapper.mail import MailMS
 from staff_stuff.models import Staff
 from rest_framework_simplejwt.tokens import RefreshToken
+from ms_stuff.exceptions import MSException
 
+from work_stuff.models import Work
 from student_stuff.models import Student
-
+from role_stuff.models import Role
 
 
 def password_create():
@@ -189,6 +191,89 @@ def delete_students():
         print(i)
         i.delete(silent=False)
         
+def create_works():
+    token = get_token()
+    x= csv.reader(open("works.csv","r"))
+    for i in x:
+        data = {
+            "name":i[0],
+            "valid_from":i[2],
+            "valid_to":i[3],
+        }
+        res = requests.post("http://localhost:8000/api/v1/works",
+        data,headers={"Authorization":"Bearer "+token})
+        print("LOG: ",res.content)
+
+        for j in i[1]:
+  
+            ses = {
+                "work":res.json()["id"],
+                "day":j,
+                "time_from":i[4],
+                "time_to":i[5]
+            }
+            res2 = requests.post("http://localhost:8000/api/v1/sessions",
+            ses,headers={"Authorization":"Bearer "+token})
+            print("SES: ",res2.content)
+
+        print("========\n")
+
+def delete_works():
+    x=Work.objects.all()
+    for i in x:
+        try:
+            i.delete(silent=False)
+        except MSException:
+            i.delete(silent=True)
+            pass
+
+def create_roles():
+    roles = [
+        {
+            "name":"Superadmin",
+            "shorthand":"SDM",
+            "is_specific":False,
+        },
+        {
+            "name":"Admin",
+            "shorthand":"ADM",
+            "is_specific":False,
+        },
+        {
+            "name":"User",
+            "shorthand":"USR",
+            "is_specific":False,
+        },
+        {
+            "name":"Main Teacher",
+            "shorthand":"mtr",
+            "is_specific":True,
+        },
+        {
+            "name":"Assistant Teacher",
+            "shorthand":"atr",
+            "is_specific":True,
+        },
+        {
+            "name":"Coordinator",
+            "shorthand":"cor",
+            "is_specific":True,
+        },
+        {
+            "name":"Academic Director",
+            "shorthand":"adr",
+            "is_specific":True,
+        },
+    ]
+    for i in roles:
+        x=Role.objects.create(
+            name=i["name"],
+            shorthand=i["shorthand"],
+            is_specific=i["is_specific"],
+            deletable=False
+        )
+        x.save()
+        print(i)
 
 
 

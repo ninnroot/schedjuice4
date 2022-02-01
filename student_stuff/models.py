@@ -52,7 +52,7 @@ class Student(CustomModel):
         if not kwargs.pop("silent",None):
             res = UserMS(self.email).delete()
             if res.status_code not in range(199,300):
-                    raise MSException(detail=res.json())
+                raise MSException(detail=res.json())
 
 
         return super().delete(*args, **kwargs)

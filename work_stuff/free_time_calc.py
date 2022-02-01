@@ -33,10 +33,11 @@ def is_session_collide(time_from,time_to, work:Work):
 
     for i in sessions:
         if i.work.status == "active":
-            if ftse(time_from,time_to,i.time_from,i.time_to):
-                return False
+            if not ftse(time_from,time_to,i.time_from,i.time_to):
+                
+                return True
 
-    return True
+    return False
 
 
 def get_schedule(staff:Staff,start=None,end=None):

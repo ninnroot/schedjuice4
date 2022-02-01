@@ -84,7 +84,7 @@ class Work(CustomModel):
         if not kwargs.pop("silent"):
             
             # "r" should be in kwargs. It's called privately anyway.
-            r = kwargs.pop("r")
+
             res = GroupMS(self.ms_id).delete()
         
 
