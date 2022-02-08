@@ -14,6 +14,10 @@ def raise_error(request,step:str):
     return request
 
 def start_user_creation_flow(request, data, user_type:str, mail=True):
+
+    # This is a mess. I should have used concurrency. But, it'd further complicate
+    # the code, so nevermind. 
+
     user = UserMS(request.data.get("email"))
     pw = data.get("password")
     # create MS user

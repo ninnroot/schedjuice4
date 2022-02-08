@@ -12,7 +12,7 @@ from work_stuff.models import Work
 from student_stuff.models import Student
 from role_stuff.models import Role
 
-
+ENDPOINT = "https://localhost:8000/api/v1/"
 
 def password_create():
     a = "abcdefghijklmnopqrsquvwxyz"
@@ -29,12 +29,28 @@ def password_create():
 
     return pw
 
-
 def get_token():
     x = Staff.objects.get(email="james@teachersucenter.com")
     return str(RefreshToken.for_user(x).access_token)
 
-
+def email_creator(name:str, controller:int):
+    legal_chars = "abcdefghijklmnopqrstuvwxyz.0123456789"
+    email = ""
+    for i in name.split():
+        if controller == 0 or controller == 1:
+            c = ""
+            for j in i.lower():
+                if j in legal_chars:
+                    c+=j
+            email+=c
+        else:
+            c=""
+            for j in i.lower():
+                if j in legal_chars:
+                    c+=j
+            email+=c[0]
+    email+=str(controller%15)
+    return email
 
 def get_ready_accounts():
     x = csv.reader(open('accounts.csv',"r"))
@@ -43,33 +59,17 @@ def get_ready_accounts():
     lst = []
     c = 0
     for i in x:
-        e=""
-
-        cc = 0
-        for j in i[0].split():
-            if cc == 0 or cc ==1:
-                e+=j.lower()
-            else:
-                e+=j[0].lower()
-            cc+=1
-
-        e+=str(c%15)
-        
+        e=email_creator(i[0],c)
         pw = password_create()
 
         y = [i[0], i[1], e+"@teachersucenter.com", pw, e]
         lst.append(y)
 
         c+=1
-
-    output = csv.writer(open("readyaccounts.csv","w"))
-    output.writerows(lst)
-
-
+    csv.writer(open("readyaccounts.csv","w")).writerows(lst)
 
 def create_staff():
     token = get_token()
-    m = MailMS()
     x = csv.reader(open("readyaccounts.csv","r"))
     
     c = 0
@@ -84,18 +84,18 @@ def create_staff():
             }
 
             res = requests.post(
-                "http://localhost:8000/api/v1/staff",
+                ENDPOINT+"staff",
                 data=data,
                 headers={"Authorization":"Bearer "+token}
                 )
 
-            print("LOG: ",c,res.content)
+            if res.status_code not in range(199,300):
+                print(f"ERROR in {c}\n",res.content)
+                break
 
-            # res = m.send_welcome("staffy@teachersucenter.com",i[1],
-            # {"name":i[0],"password":i[3],"email":i[2]})
-
+            print(f"LOG:\t{c}\t",res.content,"\n")
+            print("===========\n\n")
             c+=1
-
 
 def delete_staff():
     ban = ["james","heinthanth","su","staffy","albert","bruce"]
@@ -115,18 +115,7 @@ def get_std_acc(initial=True):
     if initial:
         c=0
         for i in x:
-            e=""
-
-            cc = 0
-            for j in i[0].split():
-                if cc == 0 or cc ==1:
-                    e+=j.lower()
-                else:
-                    e+=j[0].lower()
-                cc+=1
-
-            e+=str(c%15)
-
+            e=email_creator(i[0],c)
             lst = [
                 i[0],
                 i[1],
@@ -137,14 +126,13 @@ def get_std_acc(initial=True):
             y.writerow(lst)
             c+=1
         
-
 def add_to_class(work,student, token):
     data = {
         "work":work,
         "student":student
     }
     return requests.post(
-            "http://localhost:8000/api/v1/studentworks",
+            ENDPOINT+"studentworks",
             data=data,
             headers={"Authorization":"Bearer "+token}
             )
@@ -153,7 +141,7 @@ def add_to_class(work,student, token):
 def create_students(class_id, initial=True):
     token = get_token()
     x = csv.reader(open("readystudents.csv"))
-    m=MailMS()
+
     if initial:
         c=0
         for i in x:
@@ -168,20 +156,21 @@ def create_students(class_id, initial=True):
                 "gmail":i[1]
             }
             res = requests.post(
-                "http://localhost:8000/api/v1/students",
+                ENDPOINT+"students",
                 data=data,
                 headers={"Authorization":"Bearer "+token}
                 )
 
-            print("LOG: ",c,res.content)
-            print("\n")
-            if res.status_code in range(199,300):
-                add = add_to_class(class_id,res.json()["id"],token)
-                print("CLASS: ",add.content)
+            if res.status_code not in range(199,300):
+                print(f"ERROR in {c}\n",res.content)
+                break
 
-        
+            print(f"LOG:\t{c}\t",res.content,"\n")
+            
+            add = add_to_class(class_id,res.json()["id"],token)
+            print("CLASS: ",add.content,"\n")
             c+=1
-            print("===========")
+            print("===========\n\n")
 
 
 def delete_students():
@@ -263,6 +252,11 @@ def create_roles():
             "shorthand":"adr",
             "is_specific":True,
         },
+        {
+            "name":"Class Leader",
+            "shorthand":"clr",
+            "is_specific":True
+        }
     ]
     for i in roles:
         x=Role.objects.create(
@@ -274,19 +268,10 @@ def create_roles():
         x.save()
         print(i)
 
-
 def add_to_trial():
     token = get_token()
 
     for i in Staff.objects.all():
-        # if i.email  in [
-        #     "thanswewin24866800@gmail.com",
-        #     "saw.jessica15@gmail.com",
-        #     "yeemon1382003@gmail.com",
-        #     "ppkhine135@gmail.com",
-        #     "waiyanwilbur@gmail.com",
-        #     "khantphyowai2462002@gmail.com"
-        # ]:
             data = {
             "staff":i.id,
             "work":120,
@@ -296,8 +281,4 @@ def add_to_trial():
                     data,headers={"Authorization":"Bearer "+token})
             
             print(res.content)
-
-
-
-
 
