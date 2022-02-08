@@ -162,7 +162,7 @@ class StaffWork(CustomModel):
     def delete(self, *args, **kwargs):
         if not kwargs.pop("silent"):
             res = GroupMS(self.work.ms_id).remove_member(self.staff.ms_id,"owners")
-            print(res)
+       
             if res.status_code not in range(199,300):
                 raise MSException(res.json())
 

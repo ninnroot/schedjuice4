@@ -26,6 +26,11 @@ class StudentWorkSerializer(DynamicFieldsModelSerializer):
     def create(self, data):
         w = data.get("work")
         u = data.get("student")
+        
+        x = StudentWork.objects.filter(work=w,student=u).first()
+        if x is not None:
+            raise serializers.ValidationError("Instance already exists.")
+        
         res = UserMS(u.email).add_to_group(u.ms_id, w.ms_id, "members")
 
         if res.status_code not in range(199,300):

@@ -13,6 +13,7 @@ from student_stuff.models import Student
 from role_stuff.models import Role
 
 
+
 def password_create():
     a = "abcdefghijklmnopqrsquvwxyz"
     b = "1234567890"
@@ -128,7 +129,7 @@ def get_std_acc(initial=True):
 
             lst = [
                 i[0],
-                i[3],
+                i[1],
                 e+"@teachersucenter.com",
                 password_create(),
                 e
@@ -178,9 +179,7 @@ def create_students(class_id, initial=True):
                 add = add_to_class(class_id,res.json()["id"],token)
                 print("CLASS: ",add.content)
 
-            m.send_welcome("staffy@teachersucenter.com","tinwinnaing6969@gmail.com",
-            {"name":i[0],"email":i[2],"password":i[3]})
-
+        
             c+=1
             print("===========")
 
@@ -275,6 +274,28 @@ def create_roles():
         x.save()
         print(i)
 
+
+def add_to_trial():
+    token = get_token()
+
+    for i in Staff.objects.all():
+        # if i.email  in [
+        #     "thanswewin24866800@gmail.com",
+        #     "saw.jessica15@gmail.com",
+        #     "yeemon1382003@gmail.com",
+        #     "ppkhine135@gmail.com",
+        #     "waiyanwilbur@gmail.com",
+        #     "khantphyowai2462002@gmail.com"
+        # ]:
+            data = {
+            "staff":i.id,
+            "work":120,
+            }
+
+            res = requests.post("http://localhost:8000/api/v1/staffworks",
+                    data,headers={"Authorization":"Bearer "+token})
+            
+            print(res.content)
 
 
 

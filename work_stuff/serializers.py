@@ -1,7 +1,7 @@
 from ms_stuff.graph_wrapper.config import constants
 from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from rest_framework import serializers
-
+import time
 
 from .models import Work, StaffWork, Session, StaffSession, Category
 from staff_stuff.models import Staff
@@ -111,8 +111,9 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
     role_details = RoleOnlySerializer(source="role", fields="id,name,shorthand,is_specific", read_only=True)
 
     def validate(self, data):
-        if not data.get('role').is_specific:
-            raise serializers.ValidationError("Cannot assign non-specific role to StaffWork.")
+        if  data.get('role'):
+            if not data.get("role").is_specific:
+                raise serializers.ValidationError("Cannot assign non-specific role to StaffWork.")
 
         s = data.get("staff")
         w = data.get("work")
@@ -183,6 +184,7 @@ class WorkSerializer(DynamicFieldsModelSerializer):
         data["ms_id"] = gp_id
 
         gp = GroupMS(gp_id)
+        time.sleep(1.5)
         res = gp.create_channel("Announcement")
         if res.status_code not in range(199,300):
             raise serializers.ValidationError({"MS_error":res.json(), "step":"creating channel"})

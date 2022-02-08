@@ -2,6 +2,8 @@ from operator import mod
 from ms_stuff.graph_wrapper.user import UserMS
 from ms_stuff.exceptions import MSException
 
+from ms_stuff.graph_wrapper.group import GroupMS
+
 from work_stuff.models import Work
 from django.db import models
 from schedjuice4.models import CustomModel
@@ -75,6 +77,14 @@ class StudentWork(CustomModel):
         "SDM":[],
         "ADM":["created_at","updated_at"],
     }    
+
+    def delete(self, *args, **kwargs):
+        if not kwargs.get("silent"):
+            res = GroupMS(self.work.ms_id).remove_member(self.student.ms_id,"members")
+            if res.status_code not in range(199,300):
+                    raise MSException(detail=res.json())
+
+        return super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = "student_work"

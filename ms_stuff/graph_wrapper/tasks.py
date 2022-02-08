@@ -2,6 +2,7 @@ from .user import UserMS
 from .mail import MailMS
 
 from .config import constants
+import time
 
 from rest_framework.serializers import ValidationError
 
@@ -20,13 +21,25 @@ def start_user_creation_flow(request, data, user_type:str, mail=True):
     
     data["ms_id"] = res.json()["id"]
 
-
+    time.sleep(2.5)
     # update email addresss and usage location with a separate patch request
-    res = raise_error(user.patch_with_req(request), "update")
+    res = user.patch_with_req(request)
 
+    if res.status_code == 404:
+        res = user.patch_with_req(request)
 
+    if res.status_code not in range(199,300):
+        raise ValidationError({"MS_error":res.json(),"step":"update"})
+    
+    time.sleep(1.5)
     # assign license
-    res = raise_error(user.assign_license(user_type),"license")
+    res = user.assign_license(user_type)
+
+    if res.status_code == 404:
+        res = user.assign_license(user_type)
+
+    if res.status_code not in range(199,300):
+        raise ValidationError({"MS_error":res.json(),"step":"license"})
 
 
     # send welcome email (optional step)
