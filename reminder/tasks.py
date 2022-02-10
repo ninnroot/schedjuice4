@@ -45,10 +45,11 @@ def send_mail_task(subject, body, mail_from, mail_to):
 def work_activator():
     works = Work.objects.filter(status="ready").all()
     for i in works:
+
         if (i.valid_from - date.today()).days == 1:
             pass
         
-        elif (i.valid_from == date.today()):
+        elif (i.valid_from <= date.today()):
             i.status="active"
             i.save()
 

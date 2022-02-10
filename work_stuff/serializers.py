@@ -76,12 +76,13 @@ class SessionSerializer(DynamicFieldsModelSerializer):
 class StaffSessionSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff", fields="id,email,dname,ename,uname,profile_pic,card_pic",read_only=True)
     session_details = SessionSerializer(source="session",fields="id,work,day,time_from,time_to", read_only=True)
-    role_details = RoleOnlySerializer(source="role_set", fields="id,name,shorthand,is_specific", read_only=True)
+    role_details = RoleOnlySerializer(source="role", fields="id,name,shorthand,is_specific", read_only=True)
 
 
     def validate(self, data): 
-        if not data.get('role').is_specific:
-            raise serializers.ValidationError("Cannot assign non-specific role to StaffSession.")
+        if data.get('role'):
+            if not data.get("role").is_specific:
+                raise serializers.ValidationError("Cannot assign non-specific role to StaffSession.")
 
         s = data.get("staff")
         se = data.get("session")
@@ -111,7 +112,7 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
     role_details = RoleOnlySerializer(source="role", fields="id,name,shorthand,is_specific", read_only=True)
 
     def validate(self, data):
-        if  data.get('role'):
+        if data.get('role'):
             if not data.get("role").is_specific:
                 raise serializers.ValidationError("Cannot assign non-specific role to StaffWork.")
 

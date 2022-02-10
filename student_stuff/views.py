@@ -14,7 +14,7 @@ class StudentList(GeneralList):
     model = Student
     serializer = StudentSerializer
     related_fields = [
-        "studentwork_set"
+        "studentwork_set__work"
     ]
 
     permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]

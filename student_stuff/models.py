@@ -48,7 +48,13 @@ class Student(CustomModel):
         "SDM":[],
         "ADM":["email","password"],
              
-    }  
+    } 
+
+    excluded_fields = {
+        "SDM":[],
+        "ADM":[],
+        "USR":["house_num","street","township","city","region","postal_code"]
+    }
 
     def delete(self, *args, **kwargs):
         if not kwargs.pop("silent",None):

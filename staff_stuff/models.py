@@ -110,6 +110,12 @@ class Staff(AbstractBaseUser, PermissionsMixin):
         ]
     }
 
+    excluded_fields = {
+        "SDM":[],
+        "ADM":[],
+        "USR":["house_num","street","township","city","region","postal_code"]
+    }
+
     class Meta:
         verbose_name = 'staff'
         verbose_name_plural = 'staff members'
@@ -165,12 +171,36 @@ class Tag(CustomModel):
 
 
 
+class Job(CustomModel):
+
+    title = models.CharField(unique=True, max_length=128)
+    description = models.TextField(default="...")
+    salary = models.IntegerField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    read_only_fields = {
+        "SDM":[],
+        "ADM":[
+            "created_at",
+            "updated_at"
+        ]
+    }
+
+    class Meta:
+        verbose_name = "job"
+        verbose_name_plural = "jobs"
+        ordering = ["-id"]
+
+
+
 class StaffDepartment(CustomModel):
     
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     pos = models.IntegerField()
-    job = models.CharField(max_length=256,default="member")
+    job = models.ForeignKey(Job,on_delete=models.SET_NULL,null=True)
     is_primary = models.BooleanField(default=False)
     is_leader = models.BooleanField(default=False)
 

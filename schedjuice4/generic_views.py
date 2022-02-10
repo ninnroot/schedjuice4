@@ -6,15 +6,15 @@ from django.conf import settings
 class GeneralList(APIView,CustomPagination):
     permission_classes = []
     related_fields = []
-    read_only_fields = []
-    excluded_fields = []
+
+
     if not settings.SET_PERMISSION:
         authentication_classes = []
 
-    def get(self,request):
+    def get(self,request, **kwargs):
         return getlist_helper(self,request)
 
-    def post(self, request):
+    def post(self, request, **kwargs):
         return post_helper(self,request)
 
 
@@ -22,14 +22,13 @@ class GeneralList(APIView,CustomPagination):
 class GeneralDetails(APIView,CustomPagination):
     permission_classes = []
     related_fields = []
-    read_only_fields = []
-    excluded_fields = []
 
-    def get(self, request, obj_id):
+
+    def get(self, request, obj_id, **kwargs):
         return getdetails_helper(self,request,obj_id)
 
-    def put(self, request, obj_id):
+    def put(self, request, obj_id, **kwargs):
         return put_helper(self,request, obj_id)
 
-    def delete(self, request, obj_id):
+    def delete(self, request, obj_id, **kwargs):
         return delete_helper(self,request,obj_id)

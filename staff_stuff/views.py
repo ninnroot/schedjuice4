@@ -2,11 +2,11 @@ from rest_framework import request
 from rest_framework import permissions
 from schedjuice4.generic_views import GeneralDetails, GeneralList
 from rest_framework.permissions import IsAuthenticated
-from .models import Department, Staff, Tag, StaffTag, StaffDepartment
+from .models import Department, Job, Staff, Tag, StaffTag, StaffDepartment
 from .serializers import (
                         DepartmentSerializer, StaffSerializer,
                         StaffTagSerializer, TagSerializer,
-                        StaffDepartmentSerializer)
+                        StaffDepartmentSerializer, JobSerializer)
 
 from role_stuff.permissions import RegistrationPhase,IsADMOrReadOnly, IsOwnerOrReadOnly, StatusCheck
 
@@ -18,12 +18,15 @@ class StaffList(GeneralList):
     model = Staff
     serializer = StaffSerializer
     related_fields = [
-        "staffwork_set","staffsession_set",
-        "stafftag_set","staffdepartment_set",
-        "user_permissions","groups", "role"
+        "staffsession_set__session",
+        "staffsession_set__role",
+        "stafftag_set","staffdepartment_set__job",
+        "user_permissions","groups", "role",
+        "staffwork_set__work",
+        "staffwork_set__role"
     ]
-
-    permission_classes = [RegistrationPhase]
+    authentication_classes = []
+    permission_classes = [IsAuthenticated,RegistrationPhase, StatusCheck, IsADMOrReadOnly]
     
 
 class StaffDetails(GeneralDetails):
@@ -37,11 +40,10 @@ class DepartmentList(GeneralList):
     model = Department
     serializer = DepartmentSerializer
     related_fields = [
-        "staffdepartment_set"
+        "staffdepartment_set__staff",
+        "job_set"
     ]
     permission_classes = [IsAuthenticated,StatusCheck, IsADMOrReadOnly]
-    
-
 
 class DepartmentDetails(GeneralDetails):
     model = Department
@@ -53,19 +55,32 @@ class DepartmentDetails(GeneralDetails):
 class TagList(GeneralList):
     model = Tag
     serializer = TagSerializer
-    related_fields = ["stafftag_set"]
+    related_fields = ["stafftag_set__staff"]
     permission_classes = [IsAuthenticated,StatusCheck, IsADMOrReadOnly]
 
 class TagDetails(GeneralDetails):
     model = Tag
     serializer = TagSerializer
     permission_classes = [IsAuthenticated, StatusCheck,IsADMOrReadOnly]
-    
+
+
+
+class JobList(GeneralList):
+    model = Job
+    serializer = JobSerializer
+    permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
+
+class JobDetails(GeneralDetails):
+    model = Job
+    serializer = JobSerializer
+    permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
+
 
 
 class StaffTagList(GeneralList):
     model = StaffTag
     serializer = StaffTagSerializer
+    related_fields = ["staff","tag"]
     permission_classes = [IsAuthenticated,StatusCheck, IsADMOrReadOnly]
 
 class StaffTagDetails(GeneralDetails):
@@ -78,6 +93,7 @@ class StaffTagDetails(GeneralDetails):
 class StaffDepartmentList(GeneralList):
     model = StaffDepartment
     serializer = StaffDepartmentSerializer
+    related_fields = ["staff","department","job"]
     permission_classes = [IsAuthenticated, StatusCheck,IsADMOrReadOnly]
 
 class StaffDepartmentDetails(GeneralDetails):

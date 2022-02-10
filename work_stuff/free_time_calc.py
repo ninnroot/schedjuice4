@@ -13,14 +13,16 @@ def ftse(f,t,s,e):
 def is_free(staff:Staff,session:Session):
 
     works = StaffWork.objects.filter(staff=staff).all()
-
+    ses = Session.objects.prefetch_related("work","role").all()
+    sfs = StaffSession.objects.all()
+    
     for i in works:
         
         if  ftse(i.work.valid_from, i.work.valid_to, session.work.valid_from, session.work.valid_to):
-            sessions = Session.objects.filter(work=i.work).all().prefetch_related("work")
+            sessions = ses.objects.filter(work=i.work).all()
             
             for j in sessions:
-                if StaffSession.objects.filter(session=j,staff=staff).first():
+                if sfs.objects.filter(session=j,staff=staff).first():
                     if not ftse(j.time_from, j.time_to, session.time_from, session.time_to):
                         return False
 

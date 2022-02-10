@@ -3,7 +3,7 @@ from rest_framework import serializers
 from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
 from work_stuff.serializers import StaffSessionSerializer
 
-from .models import Department, Staff, Tag, StaffTag, StaffDepartment
+from .models import Department, Staff, Tag, StaffTag, StaffDepartment, Job
 from work_stuff.serializers import StaffWorkSerializer
 from role_stuff.serializers import RoleOnlySerializer
 
@@ -32,12 +32,19 @@ class TagOnlySerializer(DynamicFieldsModelSerializer):
 
 
 
+class JobSerializer(DynamicFieldsModelSerializer):
+    
+    class Meta:
+        model = Job
+        fields = "__all__"
 
 
 
 class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff", fields="id,dname,ename,uname,profile_pic,email,card_pic",read_only=True)
     department_details = DepartmentOnlySerializer(source="department", fields="id,name", read_only=True)
+    job_details = JobSerializer(source="job",fields="id,title",read_only=True)
+
 
     def update(self, instance, data):
         s = instance.staff

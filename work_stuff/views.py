@@ -21,6 +21,15 @@ class CategoryDetails(GeneralDetails):
 class WorkList(GeneralList):
     model = Work
     serializer = WorkSerializer
+    related_fields = [
+        "staffwork_set__staff",
+        "staffwork_set__role",
+        "category",
+        "session_set",
+        "session_set__staffsession_set__staff",
+        "session_set__staffsession_set__role",
+        "studentwork_set__student"  
+        ]
     permission_classes = [IsAuthenticated, StatusCheck,IsOwnerOrReadOnly]
 
 class WorkDetails(GeneralDetails):
@@ -33,6 +42,7 @@ class WorkDetails(GeneralDetails):
 class SessionList(GeneralList):
     model = Session
     serializer = SessionSerializer
+    related_fields = ["work","staffsession_set__staff","staffsession_set__role"]
     permission_classes = [IsAuthenticated,StatusCheck, IsOwnerOrReadOnly]
 
 class SessionDetails(GeneralDetails):
@@ -45,6 +55,7 @@ class SessionDetails(GeneralDetails):
 class StaffSessionList(GeneralList):
     model = StaffSession
     serializer = StaffSessionSerializer
+    related_fields = ["staff","session","role"]
     permission_classes = [IsAuthenticated,StatusCheck, IsADMOrReadOnly]
 
 class StaffSessionDetails(GeneralDetails):
@@ -57,11 +68,13 @@ class StaffSessionDetails(GeneralDetails):
 class StaffWorkList(GeneralList):
     model = StaffWork
     serializer = StaffWorkSerializer
+    related_fields = ["staff","work","role"]
     permission_classes = [IsAuthenticated, StatusCheck,IsADMOrReadOnly]
 
 class StaffWorkDetails(GeneralDetails):
     model = StaffWork
     serializer = StaffWorkSerializer
+    related_fields = ["staff","work","role"]
     permission_classes = [IsAuthenticated,StatusCheck, IsADMOrReadOnly]
 
 
