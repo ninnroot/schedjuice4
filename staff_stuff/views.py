@@ -25,8 +25,7 @@ class StaffList(GeneralList):
         "staffwork_set__work",
         "staffwork_set__role"
     ]
-    authentication_classes = []
-    permission_classes = [IsAuthenticated,RegistrationPhase, ]
+    permission_classes = [IsAuthenticated,RegistrationPhase, StatusCheck, IsADMOrReadOnly]
     
 
 class StaffDetails(GeneralDetails):
