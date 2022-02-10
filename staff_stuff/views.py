@@ -40,7 +40,7 @@ class DepartmentList(GeneralList):
     serializer = DepartmentSerializer
     related_fields = [
         "staffdepartment_set__staff",
-        "job_set"
+        "staffdepartment_set__job"
     ]
     permission_classes = [IsAuthenticated,StatusCheck, IsADMOrReadOnly]
 
