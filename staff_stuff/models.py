@@ -58,7 +58,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     street = models.CharField(max_length=128, default="")
     township = models.CharField(max_length=128, default="")
     city = models.CharField(max_length=128, default="")
-    region = models.CharField(max_length=8, default="0")
+    region = models.CharField(max_length=128, default="")
     country = models.CharField(max_length=16, default="mm")
     postal_code = models.CharField(max_length=12, default="")
 
@@ -199,7 +199,6 @@ class StaffDepartment(CustomModel):
     
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    pos = models.IntegerField()
     job = models.ForeignKey(Job,on_delete=models.SET_NULL,null=True)
     is_primary = models.BooleanField(default=False)
     is_leader = models.BooleanField(default=False)
@@ -227,7 +226,6 @@ class StaffTag(CustomModel):
 
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    pos = models.IntegerField()
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

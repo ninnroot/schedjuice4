@@ -37,7 +37,7 @@ class Student(CustomModel):
     street = models.CharField(max_length=128, default="")
     township = models.CharField(max_length=128, default="")
     city = models.CharField(max_length=128, default="")
-    region = models.CharField(max_length=4, default="0")
+    region = models.CharField(max_length=128, default="")
     country = models.CharField(max_length=16, default="mm")
     postal_code = models.CharField(max_length=12, default="")
 
