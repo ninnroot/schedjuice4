@@ -14,15 +14,27 @@ from rest_framework.serializers import ValidationError
 from staff_stuff.models import Staff
 
 
-def get_excluded(self,request):
+def get_read_only(self,request,obj_id=None):
+    rd = []
+    x=get_user(request)
+    if obj_id:
+        if obj_id == x.id and self.model.__name__ == "Staff":
+            return rd
+    return self.model.read_only_fields[x.role.shorthand]
+
+def get_excluded(self,request, obj_id=None):
     excluded_fields = []
+    x = get_user(request)
+    if obj_id:
+        if obj_id == x.id and (self.model.__name__ == "Staff"):
+            return excluded_fields
     if hasattr(self.model, "excluded_fields"):
-        excluded_fields = self.model.excluded_fields[get_role(request)]
+        excluded_fields = self.model.excluded_fields[x.role.shorthand]
 
     return excluded_fields
 
-def get_role(request):
-    return Staff.objects.get(pk=request.user.id).role.shorthand
+def get_user(request):
+    return Staff.objects.get(pk=request.user.id)
 
 def get_csv(self,seri):
     res = HttpResponse(content_type="text/csv")
@@ -65,7 +77,7 @@ def getlist_helper(self,request:Request):
     seri = self.serializer(
         page,many=True,
         fields=request.query_params.get("fields"),
-        read_only_fields=self.model.read_only_fields[get_role(request)],
+        read_only_fields=get_read_only(self,request),
         excluded_fields=get_excluded(self,request),
         context={"r":request}
         )
@@ -80,12 +92,11 @@ def getdetails_helper(self,request:Request,obj_id):
     obj = get_object_or_404(self.model,pk=obj_id)
     self.check_object_permissions(self.request,obj)
     
-    
     seri = self.serializer(
         obj,
         fields=request.query_params.get("fields"),
-        read_only_fields=self.model.read_only_fields[get_role(request)],
-        excluded_fields=get_excluded(self,request),
+        read_only_fields=get_read_only(self, request, obj_id),
+        excluded_fields=get_excluded(self,request,obj_id),
         context={"r":request}
         )
 
@@ -102,7 +113,7 @@ def post_helper(self, request:Request):
             
         seri = self.serializer(
             data=request.data,
-            read_only_fields=self.model.read_only_fields[get_role(request)],
+            read_only_fields=get_read_only(self, request),
             excluded_fields=get_excluded(self,request),
             context={"r":request,"silent":silent}
         )
@@ -121,8 +132,8 @@ def put_helper(self,request:Request, obj_id):
     seri = self.serializer(
         obj,
         data=request.data,partial=True,
-        read_only_fields=self.model.read_only_fields[get_role(request)],
-        excluded_fields=get_excluded(self,request),
+        read_only_fields=get_read_only(self, request, obj_id),
+        excluded_fields=get_excluded(self,request,obj_id),
         context={"r":request}
         )
     
