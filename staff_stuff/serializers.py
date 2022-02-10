@@ -79,6 +79,9 @@ class StaffTagSerializer(DynamicFieldsModelSerializer):
         if obj is not None:
             raise serializers.ValidationError("Instance already exists.")
 
+
+        return data
+
     class Meta:
         model = StaffTag
         fields = "__all__"
