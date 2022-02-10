@@ -162,10 +162,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         "other"
     ]
     _status_lst = [
-            "in progress:0",
-            "in progress:1",
-            "in progress:2",
-            "in progress:3",
+            "in progress",
             "unapproved",
             "active",
             "retired",

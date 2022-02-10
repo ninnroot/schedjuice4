@@ -213,7 +213,6 @@ class RegistrationPhase(BasePermission):
                 return False
             return True
         banned_lst = [
-            "status",
             "role",
         ]
 
