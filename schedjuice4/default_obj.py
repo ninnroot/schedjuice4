@@ -40,3 +40,98 @@ roles = [
         "is_specific": True
     }
 ]
+
+tags = [
+    {
+        "name": "contracted",
+        "description": "This staff has signed the contract.",
+        "deletable": False
+    },
+    {
+        "name": "high-achiever",
+        "description": "This staff is considered a 'high achiever' by the center.",
+        "deletable": False
+    }
+]
+
+departments = [
+    {
+        "name": "Board of Directors",
+        "shorthand": "BOD",
+        "description": "Being the pinnacle of the center, the BOD makes various decisions regarding the expansion of the center."
+
+    },
+    {
+        "name": "Secretariat",
+        "shorthand": "SEC",
+        "description": "The Secretariat consists of department heads and is also a subset of the BOD. The Secretariat and the BOD make up the Upper Management.",
+        "is_under": 1
+    },
+    {
+        "name": "IT Department",
+        "shorthand": "ITD",
+        "description": "IT Department's members design, develop and maintain the center's tech infrastructure. "
+        "They are also responsible to come up with new ideas that will automate various processes of the center "
+        "(since the center is mostly online). And, we also made this website :)",
+        "is_under": 2
+    },
+    {
+        "name": "HR Department",
+        "shorthand": "HRD",
+        "description": "The Human Resource Department plans, coordinates, and directs the administrative functions "
+        "of the center. Its oversees the recruiting, interviewing, and hiring of new staff; "
+        "consults with top executives on strategic planning; and serves as a link between the center's management and its employees.",
+        "is_under":2
+    },
+    {
+        "name":"Finance Department",
+        "shorthand":"FIN",
+        "description":"The Finance Department manages payrolls, oversees the center's spendings and consults with top executives "\
+            "on determining fees for new classes, courses and services as well as salaries for newly appointed positions. "\
+            "The department is also responsible to keep track of students' monthly fee transactions.",
+        "is_under":2
+    },
+    {
+        "name":"Marketing and Student Service Department",
+        "shorthand":"MKS",
+        "description":"The marketing aspect of the department manages the center's communication channels such as "\
+            "its Facebook page, official website, and YouTube channel. It is also responsible in the announcement of "\
+            "new classes and changes center-wide. The student service aspect deals with student registration, payment "\
+            "and complain report and resolution.",
+        "is_under":2
+    },
+    {
+        "name":"Academic Department",
+        "shorthand":"ACD",
+        "description":"The Academic Department is by far the largest in the center. The department "\
+        "consists of Main Teachers, Assistant Teachers and Coordinators. They are the frontliners of the "\
+        "center such that they are the ones conducting lessons to the students every day.",
+        "is_under":2            
+    }
+]
+
+categories = [
+    {"name":"Starters"},
+    {"name":"Movers"},
+    {"name":"Flyers"},
+    {"name":"KET"},
+    {"name":"PET"},
+    {"name":"FCE"},
+    {"name":"CAE"},
+    {"name":"CPE"},
+    {"name":"IELTS"},
+    {"name":"General English"},
+    {"name":"Club"},
+    {
+        "name":"Grammar",
+        "description":"All classes containing 'grammar' must go under this category (e.g. Grammar for IELTS)."
+    },
+    {"name":"Duolingo"}
+]
+
+
+jobs = [
+    {
+        
+    }
+]

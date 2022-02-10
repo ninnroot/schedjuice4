@@ -153,3 +153,6 @@ cython_debug/
 
 server.pem
 *.csv
+
+schedjuice4/default_obj.py
+privacy_policy.md

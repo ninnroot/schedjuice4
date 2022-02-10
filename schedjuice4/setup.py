@@ -221,14 +221,24 @@ def create_roles():
     roles = default_obj.roles
     
     for i in roles:
-        x=Role.objects.create(
-            name=i["name"],
-            shorthand=i["shorthand"],
-            is_specific=i["is_specific"],
-            deletable=False
-        )
+        x=Role.objects.create(**i)
         x.save()
         print(i)
+
+
+def create_tags():
+    pass
+
+
+def create_departments():
+    pass
+
+def create_categories():
+    pass
+
+def create_jobs():
+    pass
+
 
 def add_to_trial():
     token = get_token()
