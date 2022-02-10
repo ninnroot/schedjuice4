@@ -45,44 +45,12 @@ class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
     department_details = DepartmentOnlySerializer(source="department", fields="id,name", read_only=True)
     job_details = JobSerializer(source="job",fields="id,title",read_only=True)
 
-
-    def update(self, instance, data):
-        s = instance.staff
-        pre = instance.pos
-        nex = data.get("pos")
-
-        def f(lst):
-            for i in lst:
-                i.objects.update(pos=i.pos-1)
-                i.save()
-
-        if pre > nex:
-            f(StaffDepartment.objects.filter(staff=s,pos_lt=pre,pos_gte=nex).all())
-        
-        elif nex > pre:
-            f(StaffDepartment.objects.filter(staff=s,pos_gt=pre,pos_lte=nex).all())
-
-        else:
-            
-            return instance
-
-        instance.pos = nex
-        instance.save()
-
-        return instance
-
-
     def validate(self, data):
         s = data["staff"]
         d = data["department"]
-        pos = data["pos"]
         obj = StaffDepartment.objects.filter(staff=s,department=d).first()
         if obj is not None:
             raise serializers.ValidationError("Instance already exist.")
-
-        obj = StaffDepartment.objects.filter(staff=s,pos=pos).first()
-        if obj is not None:
-            raise serializers.ValidationError({"pos":"The index is already taken."})
 
         if "is_primary" in data:
             ip = data["is_primary"]
@@ -101,46 +69,15 @@ class StaffTagSerializer(DynamicFieldsModelSerializer):
     staff_details = StaffOnlySerializer(source="staff",fields="id,email,dname,ename,uname,profile_pic,card_pic", read_only=True)
     tag_details = TagOnlySerializer(source="tag",fields="id,name,color", read_only=True)
     
-    def update(self,instance,data):
-        s = instance.staff
-        pre = instance.pos
-        nex = data.get("pos")
-
-        def f(lst):
-            for i in lst:
-                i.objects.update(pos=i.pos-1)
-                i.save()
-
-        if pre > nex:
-            f(StaffTag.objects.filter(staff=s,pos_lt=pre,pos_gte=nex).all())
-        
-        elif nex > pre:
-            f(StaffTag.objects.filter(staff=s,pos_gt=pre,pos_lte=nex).all())
-
-        else:
-            
-            return instance
-
-        instance.pos = nex
-        instance.save()
-
-        return instance
 
     def validate(self, data):
         s = data["staff"]
         t = data["tag"]
-        pos = data["pos"]
 
         obj = StaffTag.objects.filter(staff=s,tag=t).first()
 
         if obj is not None:
             raise serializers.ValidationError("Instance already exists.")
-
-        obj = StaffTag.objects.filter(staff=s,pos=pos).first()
-
-        if obj is not None:
-            raise serializers.ValidationError({"pos":"The index is already taken."})
-        return data
 
     class Meta:
         model = StaffTag
