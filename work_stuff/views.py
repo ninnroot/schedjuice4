@@ -60,7 +60,7 @@ class StaffSessionList(GeneralList):
 
 class StaffSessionDetails(GeneralDetails):
     model = StaffSession
-    serializers = StaffSessionSerializer
+    serializer = StaffSessionSerializer
     permission_classes = [IsAuthenticated,StatusCheck, IsADMOrReadOnly]
 
 

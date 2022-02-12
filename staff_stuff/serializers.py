@@ -113,7 +113,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
         role = Staff.objects.get(pk=(self.context.get("r").user.id)).role.shorthand
         if data.get("role"):
             if data.get("role").is_specific:
-                raise serializers.ValidationError("Cannot assigned a specific role to Staff.")
+                raise serializers.ValidationError("Cannot assign a specific role to Staff.")
         
             if role == "ADM":
                 if data.get("role").shorthand in ["SDM", "ADM"]:
@@ -174,6 +174,8 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 class DepartmentSerializer(DynamicFieldsModelSerializer):
     staff = StaffDepartmentSerializer(source="staffdepartment_set",fields="id,pos,staff_details",many=True,read_only=True)
     department_details = DepartmentOnlySerializer(source="is_under",fields="id,name,shorthand", read_only=True)
+
+    
 
     class Meta:
         model = Department

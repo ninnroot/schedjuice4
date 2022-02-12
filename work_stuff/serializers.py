@@ -126,7 +126,7 @@ class StaffWorkSerializer(DynamicFieldsModelSerializer):
     def create(self, data):
         w = data["work"]
         u = data["staff"]
-        res = UserMS(u.email).add_to_group(u.ms_id,w.ms_id,"owners")
+        res = UserMS(u.email).add_to_group(u.ms_id,w.ms_id,"members")
         
         if res.status_code not in range(199,300):
             raise serializers.ValidationError({"MS_error":res.json()})
