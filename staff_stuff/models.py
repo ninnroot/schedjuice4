@@ -99,7 +99,8 @@ class Staff(AbstractBaseUser, PermissionsMixin):
             "cover_pic",
             "card_pic",
             "created_at",
-            "updated_at"
+            "updated_at",
+            "role"
         ],
         "USR":[
             "email",
