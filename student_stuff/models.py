@@ -46,7 +46,25 @@ class Student(CustomModel):
 
     read_only_fields = {
         "SDM":[],
-        "ADM":["email","password"],
+        "ADM":["email","password","ms_id"],
+        "USR":[
+            "email",
+            "ms_id",
+            "gmail",
+            "password",
+            "dname",
+            "ename",
+            "dob",
+            "gender",
+            "ph_num",
+            "house_num",
+            "street",
+            "township",
+            "city",
+            "region",
+            "country",
+            "postal_code"
+        ]
              
     } 
 
