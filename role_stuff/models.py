@@ -21,6 +21,15 @@ class Role(models.Model):
             "created_at",
             "updated_at",
         ],
+        "USR":[
+            "name",
+            "shorthand",
+            "description",
+            "is_specific",
+            "deletable",
+            "created_at",
+            "updated_at"
+        ]
     }
 
     def delete(self,*args,**kwargs):

@@ -28,7 +28,15 @@ class Department(CustomModel):
 
     read_only_fields = {
         "SDM":[],
-        "ADM":["created_at","updated_at"]
+        "ADM":["created_at","updated_at"],
+        "USR":[
+            "name",
+            "shorthand",
+            "description",
+            "is_under",
+            "created_at",
+            "updated_at"
+        ]
     }
 
     class Meta:
@@ -157,6 +165,14 @@ class Tag(CustomModel):
             "created_at",
             "updated_at",
         ],
+        "USR":[
+            "name",
+            "description",
+            "color",
+            "deletable",
+            "created_at",
+            "updated_at"
+        ]
     }
     def delete(self,*args,**kwargs):
         if not self.deletable:
@@ -185,6 +201,13 @@ class Job(CustomModel):
         "ADM":[
             "created_at",
             "updated_at"
+        ],
+        "USR":[
+            "title",
+            "description",
+            "salary",
+            "created_at",
+            "updated_at"
         ]
     }
 
@@ -211,6 +234,13 @@ class StaffDepartment(CustomModel):
         "ADM":[
             "created_at",
             "updated_at"
+        ],
+        "USR":[
+            "staff",
+            "department",
+            "job",
+            "is_primary",
+            "is_leader"
         ]
     }
 
@@ -235,7 +265,8 @@ class StaffTag(CustomModel):
         "ADM":[
             "created_at",
             "updated_at"
-        ]
+        ],
+        "USR":["staff","tag","created_at","updated_at"]
     }
 
     class Meta:

@@ -27,6 +27,12 @@ class Category(CustomModel):
             "name",
             "created_at",
             "updated_at"
+        ],
+        "USR":[
+            "name",
+            "description",
+            "created_at",
+            "updated_at"
         ]
     }
 
