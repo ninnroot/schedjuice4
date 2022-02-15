@@ -133,6 +133,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
     def create(self, validated_data):
 
         request = self.context.get("r")
+        print(validated_data)
         if not self.context.get("silent"):
             
             start_user_creation_flow(request, validated_data,"staff")

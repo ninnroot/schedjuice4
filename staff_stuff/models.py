@@ -87,8 +87,8 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     read_only_fields = {
         "SDM":[],
         "ADM":[
-            "email",
-            "uname",
+          
+         
             "description",
             "dob",
             "gender",
