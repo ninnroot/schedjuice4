@@ -14,7 +14,7 @@ from role_stuff.models import Role
 
 from . import default_obj
 
-ENDPOINT = "https://localhost:8000/api/v1/"
+ENDPOINT = "http://localhost:8000/api/v1/"
 
 def password_create():
     a = "abcdefghijklmnopqrsquvwxyz"
@@ -216,6 +216,8 @@ def delete_works():
         except MSException:
             i.delete(silent=True)
             pass
+        finally:
+            print(i)
 
 def create_roles():
     roles = default_obj.roles
@@ -231,7 +233,17 @@ def create_tags():
 
 
 def create_departments():
-    pass
+    x = default_obj.departments
+    auth = get_token()
+    c=1
+    for i in x:
+        data = {**i}
+        res = requests.post(ENDPOINT+"departments",data,
+        headers={"Authorization":"Bearer "+auth})
+        
+        print(f"LOG: {c}\t",res.json(),)
+        c+=1
+
 
 def create_categories():
     pass

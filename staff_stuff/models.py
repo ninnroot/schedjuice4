@@ -9,6 +9,7 @@ from .managers import UserManager
 from role_stuff.models import Role
 
 from ms_stuff.graph_wrapper.user import UserMS
+from ms_stuff.graph_wrapper.group import GroupMS
 from ms_stuff.exceptions import MSException
 
 from schedjuice4.models import CustomModel
@@ -19,6 +20,8 @@ from rest_framework.serializers import ValidationError
 class Department(CustomModel):
 
     name = models.CharField(max_length=256, unique=True)
+    ms_id = models.CharField(max_length=128)
+    channel_id=models.CharField(max_length=128)
     shorthand = models.CharField(unique=True,max_length=6)
     description = models.TextField()
     is_under = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
@@ -38,6 +41,15 @@ class Department(CustomModel):
             "updated_at"
         ]
     }
+    
+    def delete(self, *args, **kwargs):
+        if not kwargs.pop("silent"):
+            res = GroupMS(self.ms_id).delete()
+
+            if res.status_code not in range(199,300):
+                raise(MSException(detail=res.json()))
+
+        return super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = 'department'
@@ -87,8 +99,6 @@ class Staff(AbstractBaseUser, PermissionsMixin):
     read_only_fields = {
         "SDM":[],
         "ADM":[
-          
-         
             "description",
             "dob",
             "gender",
@@ -244,6 +254,15 @@ class StaffDepartment(CustomModel):
             "is_leader"
         ]
     }
+
+    def delete(self, *args, **kwargs):
+        if not kwargs.pop("silent"):
+            res = GroupMS(self.department.ms_id).remove_member(self.staff.ms_id,"members")
+       
+            if res.status_code not in range(199,300):
+                raise MSException(res.json())
+
+        return super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = "staffdepartment relation"

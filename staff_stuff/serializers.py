@@ -1,3 +1,4 @@
+import time
 
 from rest_framework import serializers
 from schedjuice4.serializers import DynamicFieldsModelSerializer, status_check
@@ -8,7 +9,8 @@ from work_stuff.serializers import StaffWorkSerializer
 from role_stuff.serializers import RoleOnlySerializer
 
 from ms_stuff.graph_wrapper.tasks import start_user_creation_flow
-
+from ms_stuff.graph_wrapper.group import GroupMS
+from ms_stuff.graph_wrapper.user import UserMS
 
 # Only-serializers
 
@@ -59,6 +61,15 @@ class StaffDepartmentSerializer(DynamicFieldsModelSerializer):
                 if obj is not None:
                     raise serializers.ValidationError({"is_primary":"There can only be one primary department."})
         return data
+
+    def create(self, data):
+        d = data["department"]
+        u = data["user"]
+        res = UserMS(u.email).add_to_group(u.ms_id,d.ms_id,"members")
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json()})
+
+        return super().create(data,)
 
     class Meta:
         model = StaffDepartment
@@ -145,7 +156,6 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
         return user
 
-
     def update(self, instance, data):
 
         
@@ -159,8 +169,6 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
 
         return instance
-
-
 
     class Meta:
         model = Staff
@@ -176,11 +184,32 @@ class DepartmentSerializer(DynamicFieldsModelSerializer):
     staff = StaffDepartmentSerializer(source="staffdepartment_set",fields="id,pos,staff_details",many=True,read_only=True)
     department_details = DepartmentOnlySerializer(source="is_under",fields="id,name,shorthand", read_only=True)
 
-    
+    def create(self, data):
+        res = GroupMS.create_group(data)
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json(), "step":"creating group"})
+        
+        gp_id = res.headers["Content-Location"].split("'")[1::2][0]
+        data["ms_id"] = gp_id
+        gp = GroupMS(gp_id)
+        time.sleep(1.5)
+        res = gp.create_channel("Announcement")
+        
+        if res.status_code not in range(199,300):
+            raise serializers.ValidationError({"MS_error":res.json(), "step":"creating channel"})
+        
+        data["channel_id"] = res.json()["id"]
+
+
+        return super().create(data)
 
     class Meta:
         model = Department
         fields = "__all__"
+        extra_kwargs = {
+            "ms_id":{"required":False, "read_only":True},
+            "channel_id":{"required":False, "read_only":True}
+        }
        
        
 class TagSerializer(DynamicFieldsModelSerializer):

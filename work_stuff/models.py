@@ -79,20 +79,12 @@ class Work(CustomModel):
             "updated_at"
         ]
     }
-
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
-
     
     def delete(self, *args, **kwargs):
         
- 
         if not kwargs.pop("silent"):
             
-            # "r" should be in kwargs. It's called privately anyway.
-
             res = GroupMS(self.ms_id).delete()
-        
 
             if res.status_code not in range(199,300):
                 raise(MSException(detail=res.json()))
