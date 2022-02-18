@@ -146,7 +146,7 @@ class Staff(AbstractBaseUser, PermissionsMixin):
         
         silent = kwargs.pop("silent")
         loud = not silent
-
+        kwargs.pop("r",None)
         if loud:
 
             res = UserMS(self.email).delete()
