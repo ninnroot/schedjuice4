@@ -28,12 +28,12 @@ class Student(CustomModel):
     status = models.CharField(max_length=128, default="active")
     dob = models.DateField(default=date(2000,1,1))
     gender = models.CharField(max_length=32, default="")
-    ph_num = models.CharField(max_length=16,default="", validators=[RegexValidator(r'^\d{1,11}$')])
+    ph_num = models.CharField(max_length=32,default="", validators=[RegexValidator(r'^\d{1,20}$')])
     profile_pic = models.ImageField(default="stu_profile/default.jpg", upload_to="stu_profile")
     cover_pic = models.ImageField(default="stu_cover/default.jpg",upload_to="stu_cover")
     card_pic = models.ImageField(default="stu_card/default.jpg", upload_to="stu_card")
 
-    house_num = models.CharField(max_length=16, default="")
+    house_num = models.CharField(max_length=128, default="")
     street = models.CharField(max_length=128, default="")
     township = models.CharField(max_length=128, default="")
     city = models.CharField(max_length=128, default="")
@@ -46,7 +46,7 @@ class Student(CustomModel):
 
     read_only_fields = {
         "SDM":[],
-        "ADM":["email","password","ms_id"],
+        "ADM":["ms_id"],
         "USR":[
             "email",
             "ms_id",

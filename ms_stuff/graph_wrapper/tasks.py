@@ -48,7 +48,6 @@ def start_user_creation_flow(request, data, user_type:str, mail=True):
 
     # send welcome email (optional step)
     if mail:
-        pass
         # context = {"name": data["dname"], "email":data["email"], "password":data["password"]}
         # res = MailMS().send_welcome("staffy@teachersucenter.com",data["email"],context)
         # res = raise_error(res, "mail sending")

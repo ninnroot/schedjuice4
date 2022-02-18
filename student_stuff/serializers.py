@@ -47,8 +47,17 @@ class StudentWorkSerializer(DynamicFieldsModelSerializer):
 class StudentSerializer(DynamicFieldsModelSerializer):
     works = StudentWorkSerializer(source="studentwork_set",fields="id,student_details,work_details", many=True, read_only=True)
 
+    _gender_lst = ["male","female","non-binary","other"]
+
+    def validate(self, attrs):
+        if attrs.get("gender"):
+            if attrs.get("gender") not in self._gender_lst:
+                raise serializers.ValidationError({"gender":"Gender must be in "+ self._gender_lst})
+        return super().validate(attrs)
+
     def create(self, data):
         if not self.context.get("silent"):
+            print(data)
             start_user_creation_flow(self.context.get('r'),data,"student")
 
         return super().create(data)

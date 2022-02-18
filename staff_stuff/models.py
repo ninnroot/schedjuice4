@@ -143,22 +143,20 @@ class Staff(AbstractBaseUser, PermissionsMixin):
 
     def delete(self, *args, **kwargs):
         # deleting MS account
-        try:
-            silent = kwargs.pop("silent")
-            loud = not silent
+        
+        silent = kwargs.pop("silent")
+        loud = not silent
 
-            if loud:
+        if loud:
 
-                res = UserMS(self.email).delete()
-            
-                if res.status_code not in range(199,300):
-                    raise MSException(detail=res.json())
-                    
-            return super().delete(*args, **kwargs)
+            res = UserMS(self.email).delete()
+        
+            if res.status_code not in range(199,300):
+                raise MSException(detail=res.json())
+                
+        return super().delete(*args, **kwargs)
 
-        except KeyError:
-            pass
-
+    
 
 class Tag(CustomModel):
 

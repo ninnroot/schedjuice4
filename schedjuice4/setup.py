@@ -2,6 +2,7 @@ import csv
 import requests
 import json
 import random
+from datetime import date
 
 from ms_stuff.graph_wrapper.mail import MailMS
 from staff_stuff.models import Staff
@@ -38,8 +39,9 @@ def get_token():
 def email_creator(name:str, controller:int):
     legal_chars = "abcdefghijklmnopqrstuvwxyz.0123456789"
     email = ""
+    s=0
     for i in name.split():
-        if controller == 0 or controller == 1:
+        if s == 0 or s == 1:
             c = ""
             for j in i.lower():
                 if j in legal_chars:
@@ -51,6 +53,7 @@ def email_creator(name:str, controller:int):
                 if j in legal_chars:
                     c+=j
             email+=c[0]
+        s+=1
     email+=str(controller%15)
     return email
 
@@ -110,23 +113,50 @@ def delete_staff():
             print(i.delete(silent=False))
 
 
-def get_std_acc(initial=True):
-    x = csv.reader(open("students.csv","r"))
-    y = csv.writer(open("readystudents.csv","w"))
-
-    if initial:
-        c=0
-        for i in x:
-            e=email_creator(i[0],c)
-            lst = [
-                i[0],
-                i[1],
-                e+"@teachersucenter.com",
-                password_create(),
-                e
-            ]
-            y.writerow(lst)
-            c+=1
+def get_std_acc(fname):
+    x = csv.reader(open(fname,"r",encoding="utf-8"))
+    y = csv.DictWriter(open(f"ready{fname}","w", encoding="utf-8"),
+    [
+        "dname",
+        "ename",
+        "email",
+        "password",
+        "gmail",
+        "dob",
+        "uname",
+        "gender",
+        "ph_num",
+        "house_num",
+        "street",
+        "township",
+        "city",
+        "region"
+        ])
+    y.writeheader()
+    
+    c=0
+    for i in x:
+        t = [int(j) for j in i[2].split("/")]
+        dob = date(t[2],t[1],t[0])
+        e=email_creator(i[0],c)
+        lst = {
+            "dname":i[0],
+            "ename":i[1],
+            "email":e+"@teachersucenter.com",
+            "password":password_create(),
+            "dob":dob,
+            "uname":e,
+            "gender":i[3].lower(),
+            "gmail":i[4],
+            "ph_num":i[5].strip(),
+            "house_num":i[7],
+            "street":i[8],
+            "township":i[9],
+            "city":i[10],
+            "region":i[11].split(".")[-1]
+        }
+        y.writerow(lst)
+        c+=1
         
 def add_to_class(work,student, token):
     data = {
@@ -140,39 +170,35 @@ def add_to_class(work,student, token):
             )
 
 
-def create_students(class_id, initial=True):
+def create_students(fname,class_id=None):
     token = get_token()
-    x = csv.reader(open("readystudents.csv"))
+    x = csv.DictReader(open(f"ready{fname}",encoding="utf-8"))
 
-    if initial:
-        c=0
-        for i in x:
-            if i == []:
-                continue
+    
+    c=0
+    for i in x:
+        if i == []:
+            continue
 
-            data = {
-                "dname":i[0],
-                "email":i[2],
-                "password":i[3],
-                "uname":i[4],
-                "gmail":i[1]
-            }
-            res = requests.post(
-                ENDPOINT+"students",
-                data=data,
-                headers={"Authorization":"Bearer "+token}
-                )
+        data = {**i}
+        res = requests.post(
+            ENDPOINT+"students",
+            data=data,
+            headers={"Authorization":"Bearer "+token}
+            )
 
-            if res.status_code not in range(199,300):
-                print(f"ERROR in {c}\n",res.content)
-                break
+        if res.status_code not in range(199,300):
+            print(f"ERROR in {c}\n",res.content)
+            break
 
-            print(f"LOG:\t{c}\t",res.content,"\n")
-            
+        print(f"LOG:\t{c}\t",res.content,"\n")
+        
+        if class_id:
             add = add_to_class(class_id,res.json()["id"],token)
             print("CLASS: ",add.content,"\n")
-            c+=1
-            print("===========\n\n")
+
+        c+=1
+        print("===========\n\n")
 
 
 def delete_students():
@@ -265,4 +291,6 @@ def add_to_trial():
                     data,headers={"Authorization":"Bearer "+token})
             
             print(res.content)
+
+
 
