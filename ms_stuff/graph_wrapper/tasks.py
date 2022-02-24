@@ -16,7 +16,7 @@ def raise_error(request,step:str):
 def start_user_creation_flow(request, data, user_type:str, mail=True):
 
     # This is a mess. I should have used concurrency. But, it'd further complicate
-    # the code, so nevermind. 
+    # the code, so nevermind. Maybe in Schedjuice5 :)
 
     user = UserMS(request.data.get("email"))
     pw = data.get("password")
@@ -61,5 +61,10 @@ def start_user_creation_flow(request, data, user_type:str, mail=True):
     if user_type == "staff":
         # add to security group
         res = user.add_to_group(data["ms_id"],constants["SECURITY_GROUPS"]["allstaff"],"members")
-        res = raise_error(res, "security group")
+        if res.status_code not in range(199,300):
+            raise ValidationError({"MS_error":res.json(),"step":"security group"})
+
+        res = user.add_to_group(data["ms_id"],constants["GROUPS"]["ms_support"],"members")
+        if res.status_code not in range(199,300):
+            raise ValidationError({"MS_error":res.json(),"step":"ms-support group"})
 

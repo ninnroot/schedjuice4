@@ -52,12 +52,11 @@ class StudentSerializer(DynamicFieldsModelSerializer):
     def validate(self, attrs):
         if attrs.get("gender"):
             if attrs.get("gender") not in self._gender_lst:
-                raise serializers.ValidationError({"gender":"Gender must be in "+ self._gender_lst})
+                raise serializers.ValidationError({"gender":"Gender must be in "+ str(self._gender_lst)})
         return super().validate(attrs)
 
     def create(self, data):
         if not self.context.get("silent"):
-            print(data)
             start_user_creation_flow(self.context.get('r'),data,"student")
 
         return super().create(data)

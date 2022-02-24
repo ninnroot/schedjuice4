@@ -13,6 +13,8 @@ from work_stuff.models import Work
 from student_stuff.models import Student
 from role_stuff.models import Role
 
+from ms_stuff.graph_wrapper.group import GroupMS
+from ms_stuff.graph_wrapper.user import UserMS
 from . import default_obj
 
 ENDPOINT = "http://localhost:8000/api/v1/"
@@ -137,7 +139,7 @@ def get_std_acc(fname):
     c=0
     for i in x:
         t = [int(j) for j in i[2].split("/")]
-        dob = date(t[2],t[1],t[0])
+        dob = date(t[2],t[0],t[1])
         e=email_creator(i[0],c)
         lst = {
             "dname":i[0],
@@ -173,8 +175,8 @@ def add_to_class(work,student, token):
 def create_students(fname,class_id=None):
     token = get_token()
     x = csv.DictReader(open(f"ready{fname}",encoding="utf-8"))
-
-    
+    err = csv.writer(open(f"error{fname}","w",encoding="utf-8"))
+    w=Work.objects.get(id=class_id).name
     c=0
     for i in x:
         if i == []:
@@ -189,7 +191,14 @@ def create_students(fname,class_id=None):
 
         if res.status_code not in range(199,300):
             print(f"ERROR in {c}\n",res.content)
-            break
+            if res.status_code == 400:
+
+                err.writerow([i["dname"],i["gmail"],w,res.json()])
+                print("LOGGED")
+                continue
+            else:
+                
+                break
 
         print(f"LOG:\t{c}\t",res.content,"\n")
         
@@ -294,3 +303,21 @@ def add_to_trial():
 
 
 
+def x():
+    x=csv.reader(open("data.csv","r",encoding="utf-8"))
+    x=[i for i in x]
+    for i in x:
+        if i == []:
+            continue
+        print(i)
+        g=GroupMS(i[2])
+        print("removing member")
+        res= g.remove_member(i[1],"members")
+        if res.status_code not in range(199,300):
+            print("removing owner")
+            res= g.remove_member(i[1],"owners")
+        print(res.content)
+        print("\nadding owner")
+        m=UserMS(i[0]).add_to_group(i[1],i[2],"owners")
+        print(m.content)
+        print("SUCCESS: ",i)

@@ -136,7 +136,7 @@ class StaffSerializer(DynamicFieldsModelSerializer):
 
         if data.get("gender"):
             if data.get("gender") not in self._gender_lst:
-                raise serializers.ValidationError({"gender":"Gender must be in "+ self._gender_lst})
+                raise serializers.ValidationError({"gender":"Gender must be in "+ str(self._gender_lst)})
 
         return super().validate(data)
 

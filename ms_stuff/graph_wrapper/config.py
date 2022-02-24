@@ -11,7 +11,9 @@ constants = {
         "allstaff":"b305068d-ceca-4358-aed9-ad7d3ea16938",
         "allstudents": "5b55f9b9-987b-4388-98e8-fb8c2af215a4"
     },
-
+    "GROUPS":{
+        "ms_support":"0b55c9b2-5959-45ea-a001-9523e180486a"
+    },
     "DEFAULT_PASSWORD":"VhgHDO!#@#!abc23",
     "TEST_EMAIL":"tinwinnaing6969@gmail.com",
     "STAFFY_ID":"f4f28526-7323-4ef3-8b68-978c3851bc4e"
