@@ -26,6 +26,7 @@ Jinja2==3.0.3
 kombu==5.2.2
 MarkupSafe==2.0.1
 msal==1.16.0
+numpy==1.22.2
 Pillow==9.0.0
 prompt-toolkit==3.0.23
 psycopg2-binary==2.9.2

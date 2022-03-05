@@ -125,7 +125,45 @@ categories = [
 
 
 jobs = [
+
     {
-        
+        "title":"Secretary",
+        "salary":400000
+    },
+    {
+        "title":"Academic Director",
+        "salary":350000
+    },
+    {
+        "title":"Coordinator",
+        "salary":300000
+    },
+    {
+        "title":"Content Writer",
+        "salary":300000
+    },
+    {
+        "title":"Graphic Designer",
+        "salary":300000
+    },
+    {
+        "title":"Customer Service",
+        "salary":300000
+    },
+    {
+        "title":"Student Service",
+        "salary":300000
+    },
+    {
+        "title":"Developer",
+        "salary":350000
+    },
+    {
+        "title":"UI/UX Designer",
+        "salary":350000
+    },
+    {
+        "title":"Accountant",
+        "salary":300000
     }
 ]

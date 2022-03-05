@@ -139,7 +139,7 @@ def get_std_acc(fname):
     c=0
     for i in x:
         t = [int(j) for j in i[2].split("/")]
-        dob = date(t[2],t[0],t[1])
+        dob = date(t[2],t[1],t[0])
         e=email_creator(i[0],c)
         lst = {
             "dname":i[0],
