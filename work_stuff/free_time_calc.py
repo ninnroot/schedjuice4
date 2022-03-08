@@ -29,14 +29,13 @@ def is_free(staff:Staff,session:Session):
     return True
 
 
-def is_session_collide(time_from,time_to, work:Work):
+def is_session_collide(time_from,time_to, work:Work,day):
     
     sessions = Session.objects.filter(work=work).all().prefetch_related("work")
-
     for i in sessions:
-        if i.work.status == "active":
+        if i.day == day:
             if not ftse(time_from,time_to,i.time_from,i.time_to):
-                
+                    
                 return True
 
     return False

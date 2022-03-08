@@ -63,7 +63,7 @@ class SessionSerializer(DynamicFieldsModelSerializer):
             if attrs.get("time_from") >= attrs.get("time_to"):
                 raise serializers.ValidationError("time_to must be greater than time_from")
 
-        if is_session_collide(attrs.get("time_from"),attrs.get("time_to"),attrs.get("work")):
+        if is_session_collide(attrs.get("time_from"),attrs.get("time_to"),attrs.get("work"),attrs.get("day")):
             raise serializers.ValidationError("Session is colliding with another session of this work.")
 
         return x
