@@ -164,6 +164,11 @@ class StaffWork(CustomModel):
             if res.status_code not in range(199,300):
                 raise MSException(res.json())
 
+        staffsessions = StaffSession.objects.prefetch_related("session").filter(staff=self.staff, session__work=self.work).all()
+        for i in staffsessions:
+            i.delete()
+        
+
         return super().delete(*args, **kwargs)
 
 

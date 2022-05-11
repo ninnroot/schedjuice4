@@ -9,8 +9,8 @@ from staff_stuff.models import Staff
 from rest_framework_simplejwt.tokens import RefreshToken
 from ms_stuff.exceptions import MSException
 
-from work_stuff.models import Work
-from student_stuff.models import Student
+from work_stuff.models import Session, Work, StaffWork, StaffSession
+from student_stuff.models import Student, StudentWork
 from role_stuff.models import Role
 
 from ms_stuff.graph_wrapper.group import GroupMS
@@ -176,7 +176,8 @@ def create_students(fname,class_id=None):
     token = get_token()
     x = csv.DictReader(open(f"ready{fname}",encoding="utf-8"))
     err = csv.writer(open(f"error{fname}","w",encoding="utf-8"))
-    w=Work.objects.get(id=class_id).name
+    if class_id:
+        w=Work.objects.get(id=class_id).name
     c=0
     for i in x:
         if i == []:
@@ -193,7 +194,7 @@ def create_students(fname,class_id=None):
             print(f"ERROR in {c}\n",res.content)
             if res.status_code == 400:
 
-                err.writerow([i["dname"],i["gmail"],w,res.json()])
+                err.writerow([i["dname"],i["gmail"],res.json()])
                 print("LOGGED")
                 continue
             else:
@@ -302,22 +303,16 @@ def add_to_trial():
             print(res.content)
 
 
-
-def x():
-    x=csv.reader(open("data.csv","r",encoding="utf-8"))
-    x=[i for i in x]
-    for i in x:
-        if i == []:
-            continue
-        print(i)
-        g=GroupMS(i[2])
-        print("removing member")
-        res= g.remove_member(i[1],"members")
-        if res.status_code not in range(199,300):
-            print("removing owner")
-            res= g.remove_member(i[1],"owners")
-        print(res.content)
-        print("\nadding owner")
-        m=UserMS(i[0]).add_to_group(i[1],i[2],"owners")
-        print(m.content)
-        print("SUCCESS: ",i)
+def f():
+    S = Staff.objects.all()
+    Se = StaffSession.objects.prefetch_related("staff", "session").all()
+    W = StaffWork.objects.all()
+    
+    for i in S:
+        for j in Se:
+            if i.id == j.staff.id:
+                x = W.filter(staff=i, work=j.session.work).exists()
+                if not x:
+                    d = j.delete()
+                    print(d)
+                

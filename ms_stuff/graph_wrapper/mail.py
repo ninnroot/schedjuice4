@@ -54,6 +54,19 @@ class MailMS(MSRequest):
         }
         return self._send(sender, receiver, content=content)
 
+    
+    def send_duwin_mail(self, sender: str, receiver: str, context, subj="Duwin volunteer invitation"):
+
+        text = f""
+        content = {
+            "subject": subj,
+            "context": context,
+            "template":"duwin.html",
+            "text": text
+        }
+
+        return self._send(sender, receiver, content=content)
+        
 
     def send_from_request(self, request):
         text = request.data.get("text")
