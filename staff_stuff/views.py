@@ -1,5 +1,6 @@
-from rest_framework import request
-from rest_framework import permissions
+from rest_framework import request, permissions
+from rest_framework.views import APIView, Response, status
+
 from schedjuice4.generic_views import GeneralDetails, GeneralList
 from rest_framework.permissions import IsAuthenticated
 from .models import Department, Job, Staff, Tag, StaffTag, StaffDepartment
@@ -9,6 +10,7 @@ from .serializers import (
                         StaffDepartmentSerializer, JobSerializer)
 
 from role_stuff.permissions import RegistrationPhase,IsADMOrReadOnly, IsOwnerOrReadOnly, StatusCheck
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
 
 # Create your views here.
 
@@ -33,6 +35,39 @@ class StaffDetails(GeneralDetails):
     model = Staff
     serializer = StaffSerializer
     permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
+
+
+class StaffSearch(APIView):
+    # permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
+    permission_classes = []
+
+    def get(self, request, **kwargs):
+        q = request.GET.get("q")
+        if not q:
+            return Response({"error":"The request must contain 'q' query param."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if q:
+
+            staffs = Staff.objects.all()
+            x = staffs.annotate(
+                    similarity=TrigramSimilarity("dname",q),
+                ).filter(similarity__gt=0.35)
+            
+            y=staffs.annotate(
+                similarity=TrigramSimilarity("email",q)
+            ).filter(similarity__gt=0.35)
+            search = (x|y).order_by("-similarity")
+
+            res = StaffSerializer(data=search,many=True,fields="id,dname,email,ms_id")
+            res.is_valid()
+
+            res = {
+                "count":search.count(),
+                "data":res.data
+            }
+
+            return Response(res)
+
 
 
 class DepartmentList(GeneralList):

@@ -315,4 +315,43 @@ def f():
                 if not x:
                     d = j.delete()
                     print(d)
+
+def michelle():
+
+    # name, email, classes
+
+    S = Staff.objects.all()
+    W = Work.objects.all()
+    R = [(i.shorthand, i.name) for i in Role.objects.filter(is_specific=True).exclude(name="Extra").order_by("shorthand").all()]
+    SW = StaffWork.objects.prefetch_related("staff", "work", "role", "work__category").all()
+    f = csv.writer(open("output.csv", "w"))
+    f.writerow([
+        "name",
+        "email",
+        *[i for j in [["classes as"+y[1], f"classes as {y[1]} count"]for y in R] for i in j]
+    ])
+
+    def get_filtered(obj, role_shorthand):
+        if obj.role:
+            if obj.role.shorthand == role_shorthand:
+                return True
                 
+        return False
+    
+
+    for i in S:
+        w = []
+        for j in SW:
+            if i.id == j.staff.id and j.work.category.name!="Utility":
+                w.append(j)
+
+        f.writerow([
+                i.dname, i.email, *[
+                    w for o in list(zip(["".join([x.work.name+";\n" for x in filter(lambda a: get_filtered(a, r), w)]) for r in [y[0] for y in R]], 
+                        [len([l for l in filter(lambda a: get_filtered(a, r), w)] ) for r in [y[0] for y in R]],
+                )) for w in o
+            ]
+        ])
+
+
+
