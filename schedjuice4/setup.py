@@ -3,6 +3,7 @@ import requests
 import json
 import random
 from datetime import date
+import os
 
 from ms_stuff.graph_wrapper.mail import MailMS
 from staff_stuff.models import Staff
@@ -353,5 +354,17 @@ def michelle():
             ]
         ])
 
+
+def prepare():
+    ls = os.listdir(os.getcwd())
+    for i in ls:
+        if i.split(".")[-1]=="csv" and i.startswith("p"):
+            n = i[1:len(i)].split(".")[0]
+            print(n)
+            get_std_acc(i)
+            create_students(i,n)
+            
+            
+            
 
 

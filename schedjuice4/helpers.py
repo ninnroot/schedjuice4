@@ -131,7 +131,8 @@ def put_helper(self,request:Request, obj_id):
     
     seri = self.serializer(
         obj,
-        data=request.data,partial=True,
+        data=request.data,
+        partial=True,
         read_only_fields=get_read_only(self, request, obj_id),
         excluded_fields=get_excluded(self,request,obj_id),
         context={"r":request}

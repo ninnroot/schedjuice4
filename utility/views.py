@@ -12,6 +12,8 @@ from datetime import date, timedelta, datetime
 import numpy as np
 from dateutil import relativedelta
 import csv
+from django.http import HttpResponse
+
 
 
 class FreeTimeWork(APIView):
@@ -96,7 +98,6 @@ class PayrollReport(APIView):
             "user_permissions",
             "groups",
             "role",
-     
             "staffwork_set__role"
             )
         allsessions = StaffSession.objects.all().prefetch_related(
@@ -113,6 +114,9 @@ class PayrollReport(APIView):
 
         )
         lst = []
+        big_lst = HttpResponse(content_type="text/csv")
+        big_lst['Content-Disposition'] = f'attachment; filename="export.csv"'
+        writer = csv.writer(big_lst)
         for i in allstaff:
             staff = {"id":i.id,"name":i.dname,"email":i.email,"works":[],"salary":0}
             
@@ -121,19 +125,23 @@ class PayrollReport(APIView):
                     
                     x = {"class_name":a.work.name,"sessions":[],"total":0}
                     for j in allsessions:
-                        if i.id==j.staff.id and j.role.shorthand in ["atr","clr"] and j.session.work.id==a.work.id:
-                            m = 0
-                            if j.session.work.category.name in ["IELTS"]:
-                                m+=self.pays["isf"]*dd[j.session.day]
-                            elif j.session.work.category.name in ["Preparation/Booster"]:
-                                m+=self.pays["isp"]*dd[j.session.day]
-                            else:
-                                m+=self.pays["yl"]*dd[j.session.day]
-                            staff["salary"]+=m
-                            x["total"]+=m
-                            x["sessions"].append({"day":self.days[j.session.day],"time":f"{j.session.time_from}-{j.session.time_to}","money":m})
+                        if j.role:
+                            if i.id==j.staff.id and j.role.shorthand in ["atr","clr"] and j.session.work.id==a.work.id:
+                                m = 0
+                                if j.session.work.category.name in ["IELTS"]:
+                                    m+=self.pays["isf"]*dd[j.session.day]
+                                elif j.session.work.category.name in ["Preparation/Booster"]:
+                                    m+=self.pays["isp"]*dd[j.session.day]
+                                else:
+                                    m+=self.pays["yl"]*dd[j.session.day]
+                                staff["salary"]+=m
+                                x["total"]+=m
+                                x["sessions"].append({"day":self.days[j.session.day],"time":f"{j.session.time_from}-{j.session.time_to}","money":m})
                     staff["works"].append(x)
             lst.append(staff)
-        
-
+            writer.writerow([staff["id"], staff["name"], staff["salary"]])
+        print(request.query_params)
+        if request.query_params.get("csv") == "true":
+            print('oks')
+            return big_lst
         return Response(lst,status=status.HTTP_200_OK)
