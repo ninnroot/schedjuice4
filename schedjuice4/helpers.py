@@ -1,3 +1,5 @@
+
+import random
 import csv
 
 from django.http import HttpResponse
@@ -13,6 +15,7 @@ from rest_framework.serializers import ValidationError
 
 from staff_stuff.models import Staff
 
+from datetime import date
 
 def get_read_only(self,request,obj_id=None):
     rd = []
@@ -162,6 +165,11 @@ def delete_helper(self,request:Request, obj_id):
     except MSException or ValidationError as e:
         return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
     
+
+
 
 

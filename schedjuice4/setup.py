@@ -354,4 +354,8 @@ def michelle():
         ])
 
 
-
+def gen_id():
+    x = Student.objects.all()
+    for i in x:
+        i.save()
+        print(i, i.student_id)
