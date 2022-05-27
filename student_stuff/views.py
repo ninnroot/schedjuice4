@@ -46,7 +46,7 @@ class StudentWorkDetails(GeneralDetails):
 
 
 
-class StudentSearch(APIView):
+class StudentSearch(GeneralList):
     
     permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
     model = Student
