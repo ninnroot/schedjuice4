@@ -1,18 +1,23 @@
+
+import random
 import csv
 
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import QuerySet
 
 from rest_framework.request import Request
-from .filter import get_filter_query
+from .filter import get_filter_query, get_fields_from_request
 
 from ms_stuff.exceptions import MSException
 from rest_framework.serializers import ValidationError
 
 from staff_stuff.models import Staff
 
+from datetime import date
 
 def get_read_only(self,request,obj_id=None):
     rd = []
@@ -57,6 +62,8 @@ def get_csv(self,seri):
         writer.writerow(lst)
     
     return res
+
+
 
 def getlist_helper(self,request:Request):
     
@@ -163,6 +170,62 @@ def delete_helper(self,request:Request, obj_id):
     except MSException or ValidationError as e:
         return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
 
+
+def is_requirement_satisfied(self, request):
+    for i in get_fields_from_request(self.model, request):
+        if i in self.GET:
+            continue
+        return True
+    return False
+
+
+def search_helper(self,request:Request):
+
+    fields = get_fields_from_request(self.model, request)
+    all_fields = request.GET.get("all")
+
+    if len(fields) == 0 and not all_fields:
+        return Response({"error":"The request must contain either 'all' param or at least one of the resource's fields"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not hasattr(self,"related_fields"):
+        self.related_fields = []
     
+    legit_fields = [i.name for i in self.model._meta.get_fields() if i.get_internal_type() in ["CharField", "EmailField"]]
+
+    queryset = self.model.objects.all()
+
+    if all_fields:
+        q = QuerySet.union(*[
+            queryset.annotate(similarity=TrigramSimilarity(str(i), str(all_fields))).filter(similarity__gt=0.35) 
+            for i in legit_fields
+            ])
+
+    if not all_fields:
+        q = QuerySet.union(*[
+        queryset.annotate(similarity=TrigramSimilarity(i, fields[i])).filter(similarity__gt=0.35)
+        for i in fields
+    ])
+
+    page = self.paginate_queryset(q,request)
+    
+
+    seri = self.serializer(
+        page,many=True,
+        fields=request.query_params.get("fields"),
+        read_only_fields=get_read_only(self,request),
+        excluded_fields=get_excluded(self,request),
+        context={"r":request}
+        )
+    
+    if request.GET.get("csv"):
+        return get_csv(self,seri)
+        
+    return self.get_paginated_response(seri.data, status=status.HTTP_200_OK)
+
+
+
+    
+
+
 
 

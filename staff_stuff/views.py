@@ -37,36 +37,14 @@ class StaffDetails(GeneralDetails):
     permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
 
 
-class StaffSearch(APIView):
-    # permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
-    permission_classes = []
+class StaffSearch(GeneralList):
+    model = Staff
+    serializer = StaffSerializer
+    permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
+
 
     def get(self, request, **kwargs):
-        q = request.GET.get("q")
-        if not q:
-            return Response({"error":"The request must contain 'q' query param."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if q:
-
-            staffs = Staff.objects.all()
-            x = staffs.annotate(
-                    similarity=TrigramSimilarity("dname",q),
-                ).filter(similarity__gt=0.35)
-            
-            y=staffs.annotate(
-                similarity=TrigramSimilarity("email",q)
-            ).filter(similarity__gt=0.35)
-            search = (x|y).order_by("-similarity")
-
-            res = StaffSerializer(data=search,many=True,fields="id,dname,email,ms_id")
-            res.is_valid()
-
-            res = {
-                "count":search.count(),
-                "data":res.data
-            }
-
-            return Response(res)
+        return super().search(request, **kwargs)
 
 
 

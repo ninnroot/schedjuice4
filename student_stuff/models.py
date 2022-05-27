@@ -11,6 +11,7 @@ from schedjuice4.models import CustomModel
 from django.core.validators import RegexValidator
 
 from datetime import date
+from schedjuice4.id_utils import id_creator
 
 
 # Create your models here.
@@ -20,6 +21,7 @@ class Student(CustomModel):
     email =  models.EmailField(unique=True)
     ms_id = models.CharField(max_length=256, unique=True)
     gmail = models.EmailField(unique=True,null=True)
+    student_id = models.CharField(unique=True, null=True, max_length=256)
 
     password = models.CharField(max_length=256)
     dname = models.CharField(max_length=128, default="Display Name")
@@ -46,8 +48,9 @@ class Student(CustomModel):
 
     read_only_fields = {
         "SDM":[],
-        "ADM":["ms_id"],
+        "ADM":["ms_id", "student_id"],
         "USR":[
+            "student_id",
             "email",
             "ms_id",
             "gmail",
@@ -73,6 +76,11 @@ class Student(CustomModel):
         "ADM":[],
         "USR":["house_num","street","township","city","region","postal_code"]
     }
+
+    def save(self, *args, **kwargs):
+        if not self.student_id:
+            self.student_id = id_creator(Student.objects.exclude(student_id__isnull=True).all())
+        return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if not kwargs.pop("silent",None):

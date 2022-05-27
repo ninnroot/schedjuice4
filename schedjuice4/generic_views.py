@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from .helpers import getlist_helper, getdetails_helper, post_helper, put_helper, delete_helper
+from .helpers import getlist_helper, getdetails_helper, post_helper, put_helper, delete_helper, search_helper
 from .pagination import CustomPagination
 from django.conf import settings
 
@@ -16,6 +16,9 @@ class GeneralList(APIView,CustomPagination):
 
     def post(self, request, **kwargs):
         return post_helper(self,request)
+
+    def search(self, request, **kwargs):
+        return search_helper(self,request)
 
 
 
