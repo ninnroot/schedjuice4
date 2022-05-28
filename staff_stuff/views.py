@@ -1,5 +1,3 @@
-from rest_framework import request, permissions
-from rest_framework.views import APIView, Response, status
 
 from schedjuice4.generic_views import GeneralDetails, GeneralList
 from rest_framework.permissions import IsAuthenticated
@@ -10,7 +8,7 @@ from .serializers import (
                         StaffDepartmentSerializer, JobSerializer)
 
 from role_stuff.permissions import RegistrationPhase,IsADMOrReadOnly, IsOwnerOrReadOnly, StatusCheck
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, TrigramSimilarity
+
 
 # Create your views here.
 
@@ -25,7 +23,9 @@ class StaffList(GeneralList):
         "stafftag_set","staffdepartment_set__job",
         "user_permissions","groups", "role",
         "staffwork_set__work",
-        "staffwork_set__role"
+        "staffwork_set__role",
+        "stafftag_set__tag"
+
     ]
     permission_classes = [IsAuthenticated,RegistrationPhase, IsADMOrReadOnly]
     
@@ -40,7 +40,16 @@ class StaffDetails(GeneralDetails):
 class StaffSearch(GeneralList):
     model = Staff
     serializer = StaffSerializer
-    permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
+    permission_classes = [IsAuthenticated, IsADMOrReadOnly]
+    related_fields = [
+        "staffsession_set__session",
+        "staffsession_set__role",
+        "stafftag_set","staffdepartment_set__job",
+        "user_permissions","groups", "role",
+        "staffwork_set__work",
+        "staffwork_set__role",
+        "stafftag_set__tag"
+    ]
 
 
     def get(self, request, **kwargs):

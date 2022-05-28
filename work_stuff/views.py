@@ -38,6 +38,24 @@ class WorkDetails(GeneralDetails):
     permission_classes = [IsAuthenticated, StatusCheck,IsOwnerOrReadOnly]
 
 
+class WorkSearch(GeneralList):
+    model = Work
+    serializer = WorkSerializer
+    permission_classes = [IsAuthenticated, StatusCheck,IsOwnerOrReadOnly]
+    related_fields = [
+        "staffwork_set__staff",
+        "staffwork_set__role",
+        "category",
+        "session_set",
+        "session_set__staffsession_set__staff",
+        "session_set__staffsession_set__role",
+        "studentwork_set__student"  
+        ]
+
+    def get(self, request, **kwargs):
+        return super().search(request, **kwargs)
+
+
 
 class SessionList(GeneralList):
     model = Session

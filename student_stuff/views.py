@@ -47,7 +47,12 @@ class StudentWorkDetails(GeneralDetails):
 
 
 class StudentSearch(GeneralList):
-    
+    related_fields = [
+        "studentwork_set",
+        "studentwork_set__student",
+        "studentwork_set__work"
+
+    ]
     permission_classes = [IsAuthenticated, StatusCheck, IsADMOrReadOnly]
     model = Student
     serializer = StudentSerializer

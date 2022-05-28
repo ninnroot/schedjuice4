@@ -182,7 +182,10 @@ def is_requirement_satisfied(self, request):
 def search_helper(self,request:Request):
 
     fields = get_fields_from_request(self.model, request)
+
     all_fields = request.GET.get("all")
+
+
 
     if len(fields) == 0 and not all_fields:
         return Response({"error":"The request must contain either 'all' param or at least one of the resource's fields"}, status=status.HTTP_400_BAD_REQUEST)
@@ -190,15 +193,19 @@ def search_helper(self,request:Request):
     if not hasattr(self,"related_fields"):
         self.related_fields = []
     
+
+    
     legit_fields = [i.name for i in self.model._meta.get_fields() if i.get_internal_type() in ["CharField", "EmailField"]]
 
-    queryset = self.model.objects.all()
+    queryset = self.model.objects.prefetch_related(*self.related_fields).all()
+
 
     if all_fields:
         q = QuerySet.union(*[
-            queryset.annotate(similarity=TrigramSimilarity(str(i), str(all_fields))).filter(similarity__gt=0.35) 
+            queryset.annotate(similarity=TrigramSimilarity(i, all_fields)).filter(similarity__gt=0.30) 
             for i in legit_fields
             ])
+
 
     if not all_fields:
         q = QuerySet.union(*[
@@ -206,17 +213,19 @@ def search_helper(self,request:Request):
         for i in fields
     ])
 
-    page = self.paginate_queryset(q,request)
+    page = self.paginate_queryset(q.order_by("-similarity"),request)
     
+
 
     seri = self.serializer(
         page,many=True,
         fields=request.query_params.get("fields"),
-        read_only_fields=get_read_only(self,request),
-        excluded_fields=get_excluded(self,request),
+        #read_only_fields=get_read_only(self,request),
+        #excluded_fields=get_excluded(self,request),
         context={"r":request}
         )
-    
+
+
     if request.GET.get("csv"):
         return get_csv(self,seri)
         

@@ -7,6 +7,7 @@ urlpatterns = [
     path("categories/<int:obj_id>", views.CategoryDetails.as_view()),
     path("works", views.WorkList.as_view()),
     path("works/<int:obj_id>", views.WorkDetails.as_view()),
+    path("works/search", views.WorkSearch.as_view()),
     path("sessions", views.SessionList.as_view()),
     path("sessions/<int:obj_id>", views.SessionDetails.as_view()),
     path("staffworks", views.StaffWorkList.as_view()),
