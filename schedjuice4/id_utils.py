@@ -10,8 +10,8 @@ def add_til_1(input_num:int):
 
 
 def make_check_digit(input_num:str):
-    if len(input_num) != 4:
-        raise Exception("Input number must be of length 4")
+    # if len(input_num) != 4:
+    #    raise Exception("Input number must be of length 4")
     i0, i1,i2, i3 = [int(i) for i in list(input_num)]
     x = add_til_1(i0**6 + i1**9 + i2**6 + i3**9)
     y = add_til_1(i0**9 + i1**6 + i2**9 + i3**6)
