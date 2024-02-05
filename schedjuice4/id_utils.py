@@ -16,7 +16,7 @@ def make_check_digit(input_num:str):
     x = add_til_1(i0**6 + i1**2 + i2**6 + i3**9)
     y = add_til_1(i0**9 + i1**6 + i2**3 + i3**6)
     z = add_til_1((x+y)*x**y + 31415)
-    alphat = add_till_1(z*3)
+    alphat = add_til_1(z*3)
     return str(alpha)
 
 
