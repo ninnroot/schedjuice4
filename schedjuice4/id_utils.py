@@ -32,7 +32,7 @@ def check_validity(student_id:str):
 def id_creator(model_set):
     existing_ids = {i.student_id[2:6] for i in model_set}
     this_year = date.today().year
-    available_ids = {str(i) for i in range(1000,9999)}.difference(existing_ids)
+    available_ids = {str(i) for i in range(1000,19999)}.difference(existing_ids)
     random_num = random.choice(list(available_ids))
 
     the_id = str(this_year)[2:4] + str(random_num) + make_check_digit(random_num)
